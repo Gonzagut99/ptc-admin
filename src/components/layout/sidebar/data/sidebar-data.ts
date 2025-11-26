@@ -1,7 +1,6 @@
 import {
   ArrowDownCircle,
   ArrowUpCircle,
-  BriefcaseBusiness,
   Building2,
   ClipboardList,
   Factory,
@@ -111,19 +110,13 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
-      title: "Cliente y proveedores",
+      title: "Cliente",
       items: [
         {
           title: "Clientes",
-          url: "/clients",
+          url: "/customers",
           icon: Store,
           permission: "customer:*",
-        },
-        {
-          title: "Proveedores",
-          url: "/suppliers",
-          icon: BriefcaseBusiness,
-          permission: "supplier:*",
         },
       ],
     },

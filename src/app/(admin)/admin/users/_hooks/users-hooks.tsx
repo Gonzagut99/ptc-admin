@@ -8,7 +8,6 @@ import { useFilters } from "@/hooks/use-filters";
 import { usePagination } from "@/hooks/use-pagination";
 import { backend } from "@/lib/api/types/backend";
 import { UserDetailResponse } from "../_types/users.types";
-
 export interface UserFilters {
   isActive?: boolean;
   roles?: string[];

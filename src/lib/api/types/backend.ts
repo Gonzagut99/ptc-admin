@@ -23,8 +23,25 @@ if (!BACKEND_URL) {
   throw new Error("NEXT_PUBLIC_BACKEND_URL environment variable is not set");
 }
 
-export const backendUrl = (baseUrl: string, version?: string) => {
-  return version ? `${baseUrl}/${version}` : baseUrl;
+export const backendUrl = (
+  baseUrl: string,
+  version?: string,
+  endpoint?: string
+) => {
+  if (baseUrl.endsWith("/")) {
+    baseUrl = baseUrl.slice(0, -1);
+  }
+  if (version && version.startsWith("/")) {
+    version = version.slice(1);
+  }
+
+  if (endpoint && endpoint.startsWith("/")) {
+    endpoint = endpoint.slice(1);
+  }
+
+  const base = version ? `${baseUrl}/${version}` : baseUrl;
+  const complete = endpoint ? `${base}/${endpoint}` : base;
+  return complete;
 };
 
 /**
@@ -47,11 +64,41 @@ export const enhancedFetch = async (
 };
 
 /**
+ * Custom query serializer that handles nested objects properly
+ */
+function customQuerySerializer(params: Record<string, any>): string {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      if (typeof value === "object" && !Array.isArray(value)) {
+        // For requestDto, flatten the object properties
+        if (key === "requestDto") {
+          Object.entries(value).forEach(([nestedKey, nestedValue]) => {
+            if (nestedValue !== undefined && nestedValue !== null) {
+              searchParams.append(nestedKey, String(nestedValue));
+            }
+          });
+        } else {
+          // Serialize other nested objects as JSON string
+          searchParams.append(key, JSON.stringify(value));
+        }
+      } else {
+        searchParams.append(key, String(value));
+      }
+    }
+  });
+
+  return searchParams.toString();
+}
+
+/**
  * Client for connecting with the backend
  */
 const fetchClient = createFetchClient<paths>({
   baseUrl: backendUrl(BACKEND_URL),
   fetch: enhancedFetch,
+  // querySerializer: customQuerySerializer,
 });
 
 export const backend = createClient(fetchClient);
