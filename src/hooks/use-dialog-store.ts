@@ -22,6 +22,9 @@ export type DialogType =
   | "receive"
   | "adjustment"
   | "movement-history"
+  | "add-service"
+  | "add-payment"
+  | "add-incidency"
   | null;
 
 interface DialogStackItem<T = any> {
