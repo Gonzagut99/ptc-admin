@@ -7,9 +7,9 @@ import {
   RefreshCcw,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession, useSignOut } from "@/app/auth/log-in/_hooks/auth-hooks";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,8 +25,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
-import { forceLogout } from "@/lib/auth-client";
+import { authClient } from "@/lib/api-java/auth-client";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
@@ -38,26 +39,35 @@ export function NavUser() {
     isError,
     reset,
   } = signOutMutation as {
-    mutate: (variables?: any) => void;
+    mutate: (variables?: unknown) => void;
     isPending: boolean;
     isError?: boolean;
     reset?: () => void;
   };
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Esperar hasta que el componente esté montado en el cliente
+  // para evitar errores de hidratación con localStorage
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleSignOut = () => {
-    // Si no hay sesión, usar forceLogout para limpiar cookies
+    // Si no hay sesión, limpiar auth data y redirigir
     if (!session) {
-      forceLogout();
+      authClient.clearAuthData();
+      window.location.href = "/auth/log-in";
       return;
     }
     signOut({});
   };
 
   const handleRetrySignOut = () => {
-    // Si no hay sesión, usar forceLogout para limpiar cookies
+    // Si no hay sesión, limpiar auth data y redirigir
     if (!session) {
-      forceLogout();
+      authClient.clearAuthData();
+      window.location.href = "/auth/log-in";
       return;
     }
     if (reset) {
@@ -66,13 +76,17 @@ export function NavUser() {
     signOut({});
   };
 
-  if (isLoading) {
+  // Mostrar skeleton durante SSR y mientras carga
+  if (!isMounted || isLoading) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton size="lg" disabled>
-            <Spinner className="h-4 w-4" />
-            <span className="text-sm">Cargando...</span>
+            <Skeleton className="h-8 w-8 rounded-lg" />
+            <div className="grid flex-1 gap-1">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-3 w-32" />
+            </div>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
@@ -91,20 +105,16 @@ export function NavUser() {
               {session ? (
                 <>
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage
-                      src={session?.user.image || ""}
-                      alt={session?.user?.name}
-                    />
                     <AvatarFallback className="rounded-lg">
-                      {session?.user.name.slice(0, 2).toUpperCase()}
+                      {session?.userName?.slice(0, 2).toUpperCase() || session?.email?.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-start text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      {session?.user.name}
+                      {session?.userName || session?.email}
                     </span>
                     <span className="truncate text-xs">
-                      {session?.user.email}
+                      {session?.email}
                     </span>
                   </div>
                 </>
@@ -175,20 +185,16 @@ export function NavUser() {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage
-                        src={session?.user.image || ""}
-                        alt={session?.user?.name}
-                      />
                       <AvatarFallback className="rounded-lg">
-                        {session?.user.name.slice(0, 2).toUpperCase()}
+                        {session?.userName?.slice(0, 2).toUpperCase() || session?.email?.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-start text-sm leading-tight">
                       <span className="truncate font-semibold">
-                        {session?.user.name}
+                        {session?.userName || session?.email}
                       </span>
                       <span className="truncate text-xs">
-                        {session?.user.email}
+                        {session?.email}
                       </span>
                     </div>
                   </div>

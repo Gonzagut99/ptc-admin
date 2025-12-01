@@ -1,9 +1,7 @@
 "use client";
 import { AlertCircle, AlertTriangle, LogOut, RefreshCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { getRoleInfo } from "@/app/(admin)/admin/_shared/_utils/roles";
-import { useGetUser } from "@/app/(admin)/admin/users/_hooks/users-hooks";
+import { useEffect, useState } from "react";
 import { useSession, useSignOut } from "@/app/auth/log-in/_hooks/auth-hooks";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,14 +14,13 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { forceLogout } from "@/lib/auth-client";
-import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { authClient } from "@/lib/api-java/auth-client";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Spinner } from "../ui/spinner";
-import { UserAvatarProfile } from "../ui/user-avatar-profile";
 
 export function UserNav() {
-  const { data, isLoading } = useSession();
+  const { data: user, isLoading } = useSession();
   const router = useRouter();
   const signOutMutation = useSignOut();
   const {
@@ -32,30 +29,41 @@ export function UserNav() {
     isError,
     reset,
   } = signOutMutation as {
-    mutate: (variables?: any) => void;
+    mutate: (variables?: unknown) => void;
     isPending: boolean;
     isError?: boolean;
     reset?: () => void;
   };
-  const user = data?.user;
-  const { data: userData, isLoading: isLoadingUser } = useGetUser(
-    user?.id || "",
-  );
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Esperar hasta que el componente esté montado en el cliente
+  // para evitar errores de hidratación con localStorage
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Datos del usuario adaptados para compatibilidad
+  const userName = user?.userName || user?.email || "";
+  const userEmail = user?.email || "";
+  const userInitials = userName.slice(0, 2).toUpperCase();
 
   const handleSignOut = () => {
-    // Si no hay sesión, usar forceLogout para limpiar cookies
+    // Si no hay sesión, limpiar auth data y redirigir
     if (!user) {
-      forceLogout();
+      authClient.clearAuthData();
+      window.location.href = "/auth/log-in";
       return;
     }
     signOut({});
   };
 
   const handleRetrySignOut = () => {
-    // Si no hay sesión, usar forceLogout para limpiar cookies
+    // Si no hay sesión, limpiar auth data y redirigir
     if (!user) {
-      forceLogout();
+      authClient.clearAuthData();
+      window.location.href = "/auth/log-in";
       return;
     }
     if (reset) {
@@ -64,10 +72,11 @@ export function UserNav() {
     signOut({});
   };
 
-  if (isLoading) {
+  // Mostrar skeleton durante SSR y mientras carga
+  if (!isMounted || isLoading) {
     return (
-      <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-        <UserAvatarProfile user={null} />
+      <Button variant="ghost" className="relative h-8 w-8 rounded-full" disabled>
+        <Skeleton className="h-8 w-8 rounded-full" />
       </Button>
     );
   }
@@ -77,7 +86,11 @@ export function UserNav() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           {user ? (
-            <UserAvatarProfile user={user} />
+            <Avatar className="h-8 w-8 rounded-full">
+              <AvatarFallback className="bg-muted font-bold">
+                {userInitials}
+              </AvatarFallback>
+            </Avatar>
           ) : (
             <Avatar className="h-8 w-8 rounded-full">
               <AvatarFallback className="bg-destructive/10">
@@ -134,45 +147,18 @@ export function UserNav() {
             <DropdownMenuLabel className="font-normal">
               <div className="flex gap-3 items-center justify-start">
                 <Avatar className="h-12 w-12 shrink-0">
-                  <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
                   <AvatarFallback className="bg-muted font-bold">
-                    {user?.name?.slice(0, 2).toUpperCase() || ""}
+                    {userInitials}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-foreground truncate">
-                    {user?.name || ""}
+                    {userName}
                   </p>
                   <p className="text-xs text-muted-foreground truncate">
-                    {user?.email || ""}
+                    {userEmail}
                   </p>
-                  {isLoadingUser ? (
-                    <div className="flex items-center gap-1 mt-2">
-                      <Spinner />
-                    </div>
-                  ) : userData?.roles && userData.roles.length > 0 ? (
-                    <div className="flex flex-wrap items-center gap-1 mt-2">
-                      {userData.roles.map((role) => {
-                        const roleInfo = getRoleInfo(role.name);
-                        const Icon = roleInfo.icon;
-                        return (
-                          <div
-                            key={role.id}
-                            className="flex items-center gap-1 h-5 bg-primary/10 rounded px-2 py-1"
-                          >
-                            <Icon
-                              className={cn(
-                                "h-3 w-3 mr-1 text-secondary-foreground",
-                              )}
-                            />
-                            <span className="capitalize text-sm text-secondary-foreground">
-                              {role.name}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : null}
+                  {/* TODO: Agregar roles cuando el backend los soporte en UserInfoDto */}
                 </div>
               </div>
             </DropdownMenuLabel>

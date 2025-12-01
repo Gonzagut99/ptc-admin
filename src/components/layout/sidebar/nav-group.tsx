@@ -3,7 +3,7 @@
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useAuthorization } from "@/app/auth/log-in/_hooks/auth-hooks";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -30,6 +30,7 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import {
   NavCollapsible,
@@ -80,14 +81,40 @@ const hasNavPermission = (
 
 export function NavGroup({ title, items, permission, roles }: NavGroupProps) {
   const { state } = useSidebar();
-  const { isAuthenticated, hasPermission, hasRole } = useAuthorization();
+  const { isAuthenticated, hasPermission, hasRole, isLoading } = useAuthorization();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Esperar hasta que el componente esté montado en el cliente
+  // para evitar errores de hidratación con localStorage
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Recrear la URL completa como lo hacía TanStack
   const href = `${pathname}${
     searchParams.toString() ? `?${searchParams.toString()}` : ""
   }`;
+
+  // Mostrar skeleton durante SSR y mientras carga la autenticación
+  if (!isMounted || isLoading) {
+    return (
+      <SidebarGroup>
+        <SidebarGroupLabel>{title}</SidebarGroupLabel>
+        <SidebarMenu>
+          {items.slice(0, 3).map((_, index) => (
+            <SidebarMenuItem key={`skeleton-${title}-${index}`}>
+              <div className="flex items-center gap-2 px-2 py-1.5">
+                <Skeleton className="h-4 w-4 rounded" />
+                <Skeleton className="h-4 flex-1 rounded" />
+              </div>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
+    );
+  }
 
   // Verificar permisos a nivel de grupo primero
   if (!isAuthenticated()) {

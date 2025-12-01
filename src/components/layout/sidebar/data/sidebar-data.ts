@@ -1,26 +1,18 @@
 import {
-  ArrowDownCircle,
-  ArrowUpCircle,
-  Building2,
-  ClipboardList,
-  Factory,
-  Hammer,
-  HandCoins,
-  KeyRound,
-  Layers3,
+  Bell,
+  FileText,
   LayoutDashboard,
-  LayoutList,
-  PencilRuler,
-  Repeat,
-  Store,
+  Settings,
+  Shield,
   Users,
+  UserCog,
 } from "lucide-react";
 import LogoSmall from "@/assets/logo-small";
 import { type SidebarData } from "./types";
 
 export const sidebarData: SidebarData = {
   business: {
-    name: "Work Wear",
+    name: "PTC Agency",
     logo: LogoSmall,
   },
   navGroups: [
@@ -35,105 +27,57 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
-      title: "Producción y pedidos",
+      title: "Operaciones",
       items: [
         {
-          title: "Órdenes y cotizaciones",
-          url: "/orders-and-quotations",
-          icon: ClipboardList,
+          title: "Liquidaciones",
+          url: "/liquidations",
+          icon: FileText,
         },
-        {
-          title: "Gestión de producción",
-          url: "/production-management",
-          icon: Factory,
-        },
-        {
-          title: "Control de medidas",
-          url: "/measurement-control",
-          icon: PencilRuler,
-        },
-      ],
-    },
-    {
-      title: "Preparación de prenda",
-      items: [
-        {
-          title: "Plantillas por prenda",
-          url: "/garment-templates",
-          icon: LayoutList,
-        },
-        {
-          title: "Insumos",
-          url: "/supplies",
-          icon: Layers3,
-        },
-        {
-          title: "Mano de obra",
-          url: "/labor",
-          icon: Hammer,
-        },
-      ],
-    },
-    {
-      title: "Gestión de Talleres y pagos",
-      items: [
-        {
-          title: "Talleres",
-          url: "/workshops",
-          icon: Building2,
-        },
-        {
-          title: "Pagos a trabajadores",
-          url: "/worker-payments",
-          icon: HandCoins,
-        },
-      ],
-    },
-    {
-      title: "Caja",
-      items: [
-        {
-          title: "Cuentas por cobrar",
-          url: "/accounts-receivable",
-          icon: ArrowDownCircle,
-        },
-        {
-          title: "Cuentas por pagar",
-          url: "/accounts-payable",
-          icon: ArrowUpCircle,
-        },
-        {
-          title: "Insumos y salidas",
-          url: "/supplies-and-outputs",
-          icon: Repeat,
-        },
-      ],
-    },
-    {
-      title: "Cliente",
-      items: [
         {
           title: "Clientes",
           url: "/customers",
-          icon: Store,
-          permission: "customer:*",
+          icon: Users,
+        },
+        // {
+        //   title: "Proveedores",
+        //   url: "/suppliers",
+        //   icon: Plane,
+        // },
+      ],
+    },
+    {
+      title: "Administración",
+      items: [
+        {
+          title: "Personal",
+          url: "/staff",
+          icon: UserCog,
+        },
+        {
+          title: "Usuarios",
+          url: "/users",
+          icon: Users,
         },
       ],
     },
     {
-      title: "Configuración general",
+      title: "Configuración",
       items: [
         {
-          title: "Usuarios",
-          url: "/admin/users",
-          icon: Users,
-          permission: "user:*",
+          title: "Mi perfil",
+          url: "/settings/profile",
+          icon: Settings,
         },
         {
-          title: "Roles y permisos",
-          url: "/admin/roles",
-          icon: KeyRound,
-          permission: "role:*",
+          title: "Seguridad",
+          url: "/settings/security",
+          icon: Shield,
+        },
+        {
+          title: "Notificaciones",
+          url: "/settings/notifications",
+          icon: Bell,
         },
       ],
     },

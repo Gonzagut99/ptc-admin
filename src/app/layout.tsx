@@ -29,12 +29,12 @@ export default async function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body className="antialiased" suppressHydrationWarning>
-        <AuthProvider>
-          <QueryProvider>
+        <QueryProvider>
+          <AuthProvider>
             <NextTopLoader color="var(--primary)" showSpinner={false} />
             {children}
-          </QueryProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </QueryProvider>
         <Toaster
           closeButton
           expand={false}

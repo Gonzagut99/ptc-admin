@@ -22,7 +22,7 @@ export default function LogInView() {
     <div className="relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-[40%_60%] p-0 bg-card">
       <div className="grid grid-rows-[auto_1fr_auto] h-full p-6">
         <div className="relative z-20 flex text-lg font-medium items-start w-full pt-6 px-6 pb-0">
-          <Logo height={45} width={332} />
+          <Logo height={45} width={200} />
         </div>
         <div className="w-full max-w-md flex items-center justify-center mx-auto">
           <Card className="w-full">
@@ -53,14 +53,14 @@ export default function LogInView() {
         </div>
         <div className="text-start text-sm font-normal px-6 pb-5">
           <p className="text-[16px] text-[#62748E]">
-            © {new Date().getFullYear()} Work Wear Industrial E.I.R.L. Todos los
+            © {new Date().getFullYear()} PTC Tours. Perú Titicaca & Connections. Todos los
             derechos reservados.
           </p>
         </div>
       </div>
       <div className="relative hidden h-full w-full flex-col lg:flex overflow-hidden">
         <img
-          src="/assets/log-in-bg-work-wear.webp"
+          src="/login-hero.png"
           alt="auth-bg"
           className="h-full w-full object-cover brightness-85"
         />

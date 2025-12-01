@@ -1,11 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail } from "lucide-react";
+import { Mail, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -21,21 +20,27 @@ import {
 } from "@/components/ui/input-group";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useLogIn } from "../_hooks/auth-hooks";
-import { FormLogInSchema, logInSchema } from "../_schemas/logIn.schema";
+import { type FormLogInSchema, logInSchema } from "../_schemas/logIn.schema";
 
 export default function LogInForm() {
-  const { mutate: logIn } = useLogIn();
+  const { mutate: logIn, isPending } = useLogIn();
   const form = useForm<FormLogInSchema>({
     resolver: zodResolver(logInSchema),
     defaultValues: {
       email: "",
       password: "",
-      remember: true,
+      //remember: true,
     },
   });
 
   const onSubmit = (values: FormLogInSchema) => {
-    logIn({ body: values });
+    // Solo enviamos email y password al backend
+    logIn({
+      body: {
+        email: values.email,
+        password: values.password,
+      },
+    });
   };
 
   return (
@@ -55,7 +60,11 @@ export default function LogInForm() {
                   <InputGroupAddon align="inline-start">
                     <Mail className="w-4 h-4" />
                   </InputGroupAddon>
-                  <InputGroupInput placeholder="Ingresa tu email" {...field} />
+                  <InputGroupInput 
+                    placeholder="Ingresa tu email" 
+                    disabled={isPending}
+                    {...field} 
+                  />
                 </InputGroup>
               </FormControl>
               <FormMessage />
@@ -72,6 +81,7 @@ export default function LogInForm() {
                 <FormControl>
                   <PasswordInput
                     placeholder="Ingresa tu contraseña"
+                    disabled={isPending}
                     {...field}
                   />
                 </FormControl>
@@ -86,7 +96,7 @@ export default function LogInForm() {
             ¿Olvidaste tu contraseña?
           </Link>
         </div>
-        <div className="flex items-center justify-between w-full gap-4">
+        {/* <div className="flex items-center justify-between w-full gap-4">
           <FormField
             control={form.control}
             name="remember"
@@ -96,6 +106,7 @@ export default function LogInForm() {
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    disabled={isPending}
                   />
                 </FormControl>
                 <FormLabel className="cursor-pointer font-normal text-sm mb-0 leading-none">
@@ -104,9 +115,16 @@ export default function LogInForm() {
               </FormItem>
             )}
           />
-        </div>
-        <Button type="submit" className="w-full">
-          Iniciar sesión
+        </div> */}
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Iniciando sesión...
+            </>
+          ) : (
+            "Iniciar sesión"
+          )}
         </Button>
       </form>
     </Form>

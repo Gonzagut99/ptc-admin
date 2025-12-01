@@ -1,11 +1,11 @@
 "use client";
 
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { useSession } from "@/app/auth/log-in/_hooks/auth-hooks";
-import { SessionResponse } from "../_types/auth.types";
+import type { UserInfoDto } from "@/lib/api-java/auth-types";
 
 type SettingsSessionContextType = {
-  session: SessionResponse | undefined;
+  session: UserInfoDto | undefined;
   isLoading: boolean;
 };
 
@@ -14,11 +14,22 @@ const SettingsSessionContext = createContext<
 >(undefined);
 
 export function SettingsSessionProvider({ children }: { children: ReactNode }) {
+  const [isMounted, setIsMounted] = useState(false);
+  
   // Una sola consulta de sesión para todos los componentes de settings
-  const { data: session, isLoading } = useSession();
+  const { data: session, isLoading: isQueryLoading } = useSession();
+
+  // Esperar hasta que el componente esté montado en el cliente
+  // para evitar errores de hidratación con localStorage
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Considerar como "cargando" si no está montado o si la query está cargando
+  const isLoading = !isMounted || isQueryLoading;
 
   return (
-    <SettingsSessionContext.Provider value={{ session, isLoading }}>
+    <SettingsSessionContext.Provider value={{ session: isMounted ? session : undefined, isLoading }}>
       {children}
     </SettingsSessionContext.Provider>
   );

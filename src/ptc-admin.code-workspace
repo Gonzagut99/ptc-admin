@@ -4,7 +4,10 @@
 			"path": ".."
 		},
 		{
-			"path": "../../../admin-new"
+			"path": "../../../backend/ptcagencydemo"
+		},
+		{
+			"path": "../../../../../../../Acide/WorkWear/admin-workwear"
 		}
 	],
 	"settings": {}

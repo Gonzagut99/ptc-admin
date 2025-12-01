@@ -1,26 +1,22 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { authClient } from "@/lib/auth-client";
-import { User } from "../_types/auth.types";
+import type { User } from "../_types/auth.types";
 
+/**
+ * Hook para actualizar el perfil del usuario
+ * TODO: Implementar cuando el backend tenga endpoint de actualización de perfil
+ */
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: User) => {
-      return await authClient.updateUser(data);
+    mutationFn: async (_data: User) => {
+      // TODO: Implementar cuando el backend tenga el endpoint
+      throw new Error("Actualización de perfil no implementada aún en el backend");
     },
     onSuccess: () => {
       // Invalidar queries relacionadas con la sesión
-      queryClient.invalidateQueries({ queryKey: ["session"] });
-
-      // Invalidar queries de auth en general
-      queryClient.invalidateQueries({
-        queryKey: ["get"],
-        exact: false,
-        predicate: (q) =>
-          (q.queryKey[1] as string | undefined)?.includes("/api/auth") ?? false,
-      });
+      queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
 
       toast.success("Perfil actualizado correctamente");
     },
@@ -42,29 +38,26 @@ export const useUpdateProfile = () => {
   };
 };
 
+/**
+ * Hook para actualizar el email del usuario
+ * TODO: Implementar cuando el backend tenga endpoint de cambio de email
+ */
 export const useUpdateEmail = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: { newEmail: string }) => {
-      return await authClient.changeEmail(data);
+    mutationFn: async (_data: { newEmail: string }) => {
+      // TODO: Implementar cuando el backend tenga el endpoint
+      throw new Error("Cambio de email no implementado aún en el backend");
     },
     onSuccess: () => {
       // Invalidar queries relacionadas con la sesión
-      queryClient.invalidateQueries({ queryKey: ["session"] });
+      queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
 
-      // Invalidar queries de auth en general
-      queryClient.invalidateQueries({
-        queryKey: ["get"],
-        exact: false,
-        predicate: (q) =>
-          (q.queryKey[1] as string | undefined)?.includes("/api/auth") ?? false,
-      });
-
-      toast.success("Perfil actualizado correctamente");
+      toast.success("Email actualizado correctamente");
     },
     onError: (error: Error) => {
-      toast.error("Error al actualizar el perfil", {
+      toast.error("Error al actualizar el email", {
         description: error.message || "Ha ocurrido un error inesperado",
       });
     },
@@ -81,30 +74,25 @@ export const useUpdateEmail = () => {
   };
 };
 
+/**
+ * Hook para actualizar la contraseña del usuario
+ * TODO: Implementar cuando el backend tenga endpoint de cambio de contraseña
+ */
 export const useUpdatePassword = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: {
+    mutationFn: async (_data: {
       newPassword: string;
       currentPassword: string;
       revokeOtherSessions: boolean;
     }) => {
-      const response = await authClient.changePassword(data);
-      if (data.revokeOtherSessions) {
-        await authClient.revokeOtherSessions();
-      }
-      return response;
+      // TODO: Implementar cuando el backend tenga el endpoint
+      throw new Error("Cambio de contraseña no implementado aún en el backend");
     },
     onSuccess: () => {
       toast.success("Contraseña actualizada correctamente");
-      queryClient.invalidateQueries({ queryKey: ["session"] });
-      queryClient.invalidateQueries({
-        queryKey: ["get"],
-        exact: false,
-        predicate: (q) =>
-          (q.queryKey[1] as string | undefined)?.includes("/api/auth") ?? false,
-      });
+      queryClient.invalidateQueries({ queryKey: ["auth", "session"] });
     },
     onError: (error: Error) => {
       toast.error("Error al actualizar la contraseña", {

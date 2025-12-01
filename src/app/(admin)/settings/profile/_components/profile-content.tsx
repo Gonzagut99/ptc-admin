@@ -1,8 +1,6 @@
 "use client";
 
-import { AlertCircle, Mail, MapPin, Phone } from "lucide-react";
-import { useState } from "react";
-import { formatPhoneNumberIntl } from "react-phone-number-input";
+import { AlertCircle, Mail, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,17 +12,10 @@ import {
 } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { useSettingsSession } from "../../_contexts/settings-session-context";
-import EmailModify from "./email-modify";
-import ProfileModify from "./profile-modify";
 
 export function ProfileContent() {
-  const [emailAddressExpanded, setEmailAddressExpanded] = useState(false);
-  const [editProfileExpanded, setEditProfileExpanded] = useState(false);
+  // const [emailAddressExpanded, setEmailAddressExpanded] = useState(false);
   const { session, isLoading } = useSettingsSession();
-
-  const editProfile = () => {
-    setEditProfileExpanded(true);
-  };
 
   if (isLoading) {
     return (
@@ -61,118 +52,87 @@ export function ProfileContent() {
 
   return (
     <div className="space-y-6 w-full">
-      {!editProfileExpanded ? (
-        <Card className="shadow-none">
-          <CardHeader>
-            <CardTitle>Información personal</CardTitle>
-            <CardDescription>
-              Tu información de perfil y datos de contacto
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row items-start gap-6">
-              <div className="flex-1 space-y-5 min-w-0">
-                <div className="space-y-2">
-                  <div className="font-medium text-base leading-tight">
-                    {session.user.name} {session.user.lastName}
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="outline" className="font-normal text-xs">
-                      {session.user.idDocumentType}
-                    </Badge>
-                    <span className="text-sm text-muted-foreground font-mono">
-                      {session.user.idNumber}
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-3 pt-5 border-t">
-                  <div className="flex items-center gap-3">
-                    <div className="mt-0.5 shrink-0">
-                      <div className="bg-primary/10 p-1.5 rounded-md">
-                        <Phone className="size-3.5 text-primary" />
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-0.5">
-                        Teléfono
-                      </div>
-                      <div className="text-sm font-medium">
-                        {formatPhoneNumberIntl(session.user.phone ?? "")}
-                      </div>
+      {/* Información del usuario */}
+      <Card className="shadow-none">
+        <CardHeader>
+          <CardTitle>Información personal</CardTitle>
+          <CardDescription>
+            Tu información de perfil
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row items-start gap-6">
+            <div className="flex-1 space-y-5 min-w-0">
+              <div className="space-y-2">
+                <div className="flex items-center gap-3">
+                  <div className="mt-0.5 shrink-0">
+                    <div className="bg-primary/10 p-1.5 rounded-md">
+                      <User className="size-3.5 text-primary" />
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="mt-0.5 shrink-0">
-                      <div className="bg-primary/10 p-1.5 rounded-md">
-                        <MapPin className="size-3.5 text-primary" />
-                      </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-0.5">
+                      Nombre de usuario
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-0.5">
-                        Dirección
-                      </div>
-                      <div className="text-sm font-medium">
-                        {session.user.address}
-                      </div>
+                    <div className="text-sm font-medium">
+                      {session.userName || "Sin nombre"}
                     </div>
                   </div>
                 </div>
               </div>
-              <Button
-                variant="outline"
-                type="button"
-                onClick={editProfile}
-                className="sm:self-start shrink-0"
-              >
-                Actualizar Perfil
-              </Button>
+              <div className="flex flex-wrap items-center gap-2 pt-3 border-t">
+                <Badge 
+                  variant={session.isActive ? "default" : "destructive"} 
+                  className="font-normal text-xs"
+                >
+                  {session.isActive ? "Activo" : "Inactivo"}
+                </Badge>
+                {session.id && (
+                  <span className="text-xs text-muted-foreground font-mono">
+                    ID: {session.id}
+                  </span>
+                )}
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <ProfileModify
-          onClose={() => setEditProfileExpanded(false)}
-          user={session.user}
-        />
-      )}
+          </div>
+        </CardContent>
+      </Card>
 
-      {!emailAddressExpanded ? (
-        <Card className="shadow-none">
-          <CardHeader>
-            <CardTitle>Correo electrónico</CardTitle>
-            <CardDescription>
-              Tu dirección de correo electrónico actual
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="mt-0.5 shrink-0">
-                <div className="bg-primary/10 p-1.5 rounded-md">
-                  <Mail className="size-3.5 text-primary" />
-                </div>
+      {/* Correo electrónico */}
+      <Card className="shadow-none">
+        <CardHeader>
+          <CardTitle>Correo electrónico</CardTitle>
+          <CardDescription>
+            Tu dirección de correo electrónico actual
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="mt-0.5 shrink-0">
+              <div className="bg-primary/10 p-1.5 rounded-md">
+                <Mail className="size-3.5 text-primary" />
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-0.5">
-                  Correo electrónico
-                </div>
-                <div className="text-sm font-medium">{session.user.email}</div>
-              </div>
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => setEmailAddressExpanded(true)}
-              >
-                Cambiar email
-              </Button>
             </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <EmailModify
-          onClose={() => setEmailAddressExpanded(false)}
-          email={session.user.email}
-        />
-      )}
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-0.5">
+                Correo electrónico
+              </div>
+              <div className="text-sm font-medium">
+                {session.email || "Sin email"}
+              </div>
+            </div>
+            {/* TODO: Implementar cambio de email cuando el backend lo soporte */}
+            <Button
+              variant="outline"
+              type="button"
+              disabled
+              title="Funcionalidad no disponible aún"
+            >
+              Cambiar email
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

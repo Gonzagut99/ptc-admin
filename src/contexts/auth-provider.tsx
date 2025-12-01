@@ -2,21 +2,23 @@
 
 import {
   createContext,
-  ReactNode,
+  type ReactNode,
   useContext,
   useSyncExternalStore,
 } from "react";
-import { authClient } from "../lib/auth-client";
+import { useSession } from "@/app/auth/log-in/_hooks/auth-hooks";
+import type { UserInfoDto } from "@/lib/api-java/auth-types";
 
 interface AuthContextType {
-  session: { user?: { id: string; email: string; name: string } } | null;
+  session: { user?: UserInfoDto } | null;
   isLoading: boolean;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { data: session, isPending: isLoading } = authClient.useSession();
+  const { data: user, isLoading, isFetched } = useSession();
 
   // Prevent hydration mismatch by ensuring server and client render the same initially
   const isMounted = useSyncExternalStore(
@@ -25,11 +27,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => false,
   );
 
+  const session = user ? { user } : null;
+
   return (
     <AuthContext.Provider
       value={{
         session: isMounted ? session : null,
-        isLoading: isMounted ? isLoading : true,
+        isLoading: isMounted ? (isLoading || !isFetched) : true,
+        isAuthenticated: isMounted ? !!user : false,
       }}
     >
       {children}
