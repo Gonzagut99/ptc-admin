@@ -76,7 +76,7 @@ export const sidebarData: SidebarData = {
         },
         {
           title: "Notificaciones",
-          url: "/settings/notifications",
+          url: "/notifications",
           icon: Bell,
         },
       ],

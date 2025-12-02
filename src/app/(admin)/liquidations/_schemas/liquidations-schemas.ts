@@ -1,19 +1,12 @@
 import { z } from "zod";
 
-// Helper para validar que un string es un número válido
-const numericString = (message: string, min = 0) =>
-  z.coerce.number().min(1, { message }).refine(
-    (val) => !Number.isNaN(Number(val)) && Number(val) >= min,
-    { message: `Debe ser un número ${min > 0 ? `mayor a ${min}` : "mayor o igual a 0"}.` }
-  );
-
 // Schema de validación para crear liquidación
 export const createLiquidationSchema = z.object({
-  customer_id: numericString("Seleccione un cliente.", 1),
+  customer_id: z.string().min(1, { message: "Seleccione un cliente." }),
 
-  staff_id: numericString("Seleccione un personal a cargo.", 1),
+  staff_id: z.string().min(1, { message: "Seleccione un personal a cargo." }),
 
-  currency_rate: z.coerce.number().min(0.01, { message: "El tipo de cambio es requerido." }).refine(
+  currency_rate: z.string().min(1, { message: "El tipo de cambio es requerido." }).refine(
     (val) => !Number.isNaN(Number(val)) && Number(val) >= 0.01,
     { message: "El tipo de cambio debe ser mayor a 0." }
   ),

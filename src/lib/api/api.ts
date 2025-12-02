@@ -853,10 +853,14 @@ export interface components {
             createdDate?: string;
             /** Format: date-time */
             updatedDate?: string;
+            title?: string;
             message?: string;
+            /** @enum {string} */
+            type?: "LIQUIDATION_CREATED" | "LIQUIDATION_STATUS_UPDATED" | "LIQUIDATION_PAYMENT_STATUS_UPDATED" | "LIQUIDATION_DELETED" | "PAYMENT_ADDED" | "PAYMENT_UPDATED" | "PAYMENT_DELETED" | "SERVICE_ADDED" | "SERVICE_UPDATED" | "SERVICE_DELETED" | "INCIDENCY_ADDED" | "INCIDENCY_UPDATED" | "INCIDENCY_DELETED" | "CUSTOMER_CREATED" | "CUSTOMER_UPDATED" | "CUSTOMER_DELETED" | "STAFF_CREATED" | "STAFF_UPDATED" | "STAFF_DELETED" | "USER_CREATED" | "USER_UPDATED" | "USER_DELETED" | "SYSTEM_INFO" | "SYSTEM_WARNING" | "SYSTEM_ERROR";
             /** @enum {string} */
             scope?: "ALL" | "SELF" | "OTHERS";
             referenceId?: string;
+            referenceType?: string;
         };
         DUserNotification: {
             /** Format: int64 */
@@ -931,9 +935,9 @@ export interface components {
             /** @enum {string} */
             status?: "PENDING" | "COMPLETED" | "CANCELED";
             pending?: boolean;
+            taxed?: boolean;
             pen?: boolean;
             usd?: boolean;
-            taxed?: boolean;
         };
         DCustomer: {
             /** Format: int64 */
@@ -1000,9 +1004,9 @@ export interface components {
             flightBookings?: components["schemas"]["DFlightBooking"][];
             /** Format: int32 */
             bookingCount?: number;
+            taxed?: boolean;
             pen?: boolean;
             usd?: boolean;
-            taxed?: boolean;
         };
         DHotelBooking: {
             /** Format: int64 */
@@ -1046,9 +1050,9 @@ export interface components {
             hotelBookings?: components["schemas"]["DHotelBooking"][];
             /** Format: int32 */
             bookingCount?: number;
+            taxed?: boolean;
             pen?: boolean;
             usd?: boolean;
-            taxed?: boolean;
         };
         DIncidency: {
             /** Format: int64 */
@@ -1108,11 +1112,11 @@ export interface components {
             staffId?: number;
             staffOnCharge?: components["schemas"]["DStaff"];
             incidencies?: components["schemas"]["DIncidency"][];
+            overdue?: boolean;
             /** Format: float */
             totalPaid?: number;
             /** Format: float */
             remainingAmount?: number;
-            overdue?: boolean;
         };
         /** @description Entidad de dominio para pagos */
         DPayment: {
@@ -1170,9 +1174,9 @@ export interface components {
             tours?: components["schemas"]["DTour"][];
             /** Format: int32 */
             tourCount?: number;
+            taxed?: boolean;
             pen?: boolean;
             usd?: boolean;
-            taxed?: boolean;
         };
         UpdatePaymentDto: {
             payment_method: string;

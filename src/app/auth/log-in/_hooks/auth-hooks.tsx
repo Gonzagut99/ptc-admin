@@ -345,6 +345,7 @@ function getCookie(name: string): string | null {
 export const useAuthorization = (): {
   isLoading: boolean;
   hasPermission: (resource: string, action: string) => boolean;
+  hasRole: (role: string) => boolean;
   isAuthenticated: () => boolean;
   user: UserInfoDto | null | undefined;
 } => {
@@ -356,6 +357,10 @@ export const useAuthorization = (): {
     user,
     hasPermission: (_resource: string, _action: string) => {
       // TODO: Implementar verificación de permisos cuando el backend lo soporte
+      return !!user;
+    },
+    hasRole: (_role: string) => {
+      // TODO: Implementar verificación de roles cuando el backend lo soporte
       return !!user;
     },
   };

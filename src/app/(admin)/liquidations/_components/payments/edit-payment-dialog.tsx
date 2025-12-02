@@ -91,6 +91,7 @@ export function EditPaymentDialog({
         body: {
           amount: Number(data.amount),
           payment_method: data.method,
+          validation_status: payment.validationStatus ?? "PENDING",
         },
       },
       {

@@ -2,7 +2,7 @@ import { AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { type JSX, useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -59,7 +59,7 @@ export function SidebarNav({
       );
     }
 
-    if (!session?.user) {
+    if (!session) {
       return (
         <div className="mb-4 pb-4 border-b">
           <div className="flex flex-col items-center gap-3 px-2 py-3">
@@ -85,20 +85,16 @@ export function SidebarNav({
       <div className="mb-4 pb-4 border-b">
         <div className="flex flex-col items-center gap-2 px-2 py-3">
           <Avatar className="h-20 w-20 rounded-full shrink-0">
-            <AvatarImage
-              src={session.user.image || ""}
-              alt={session.user.name || ""}
-            />
             <AvatarFallback className="rounded-full text-xl font-semibold">
-              {session.user.name?.slice(0, 2).toUpperCase() || ""}
+              {session.userName?.slice(0, 2).toUpperCase() || session.email?.slice(0, 2).toUpperCase() || "U"}
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col items-center min-w-0 w-full">
             <p className="text-sm font-medium text-foreground text-center truncate w-full">
-              {session.user.name || ""}
+              {session.userName || session.email || "Usuario"}
             </p>
             <span className="truncate text-xs text-muted-foreground">
-              {session.user.lastName || ""}
+              {session.email || ""}
             </span>
           </div>
         </div>

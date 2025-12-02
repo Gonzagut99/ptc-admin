@@ -55,7 +55,11 @@ export default function UpdatePasswordForm({
 
   const onSubmit = (values: FormSecuritySchema) => {
     mutate(
-      { body: values },
+      {
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword,
+        confirmPassword: values.newPassword, // Usar newPassword como confirmPassword
+      },
       {
         onSuccess: () => {
           toast.success("Contraseña actualizada correctamente");
