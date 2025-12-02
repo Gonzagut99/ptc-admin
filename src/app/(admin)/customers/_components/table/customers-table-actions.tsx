@@ -1,7 +1,8 @@
 "use client";
 
 import { Row } from "@tanstack/react-table";
-import { Eye, MoreHorizontal, Pencil, Trash } from "lucide-react";
+import { Eye, FileText, MoreHorizontal, Pencil, Trash } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -47,6 +48,12 @@ export default function CustomersTableActions({
         >
           <Pencil className="mr-2 h-4 w-4" />
           Editar
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href={`/customers/${customer.id}/liquidations`}>
+            <FileText className="mr-2 h-4 w-4" />
+            Ver liquidaciones
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

@@ -2,13 +2,32 @@
 
 import { useMemo } from "react";
 import { DataTable } from "@/components/data-table/data-table";
-import { useGetLiquidations } from "../../_hooks/liquidations-hooks";
+import {
+  useGetLiquidations,
+  useGetLiquidationsByCustomer,
+} from "../../_hooks/liquidations-hooks";
 import { LiquidationWithDetailsDto } from "../../_types/liquidations.types";
 import { liquidationsColumns } from "./liquidations-columns";
 
-export default function LiquidationsTable() {
-  const { query, data, serverPagination, searchTerm, setSearch } =
-    useGetLiquidations();
+interface LiquidationsTableProps {
+  customerId?: number;
+}
+
+export default function LiquidationsTable({
+  customerId,
+}: LiquidationsTableProps) {
+  // Use different hooks based on whether customerId is provided
+  const allLiquidationsHook = useGetLiquidations();
+  const customerLiquidationsHook = useGetLiquidationsByCustomer(
+    customerId ?? 0,
+  );
+
+  // Select the appropriate hook data based on customerId
+  const activeHook = customerId ? customerLiquidationsHook : allLiquidationsHook;
+  const { query, data, serverPagination } = activeHook;
+  const searchTerm = "searchTerm" in activeHook ? activeHook.searchTerm : "";
+  const setSearch = "setSearch" in activeHook ? activeHook.setSearch : undefined;
+
   const { isLoading } = query;
   const columns = useMemo(() => liquidationsColumns(), []);
 
