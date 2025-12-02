@@ -12,6 +12,12 @@ import {
   User,
   Users,
   Plus,
+  FileText,
+  Image as ImageIcon,
+  ExternalLink,
+  CheckCircle,
+  Clock,
+  XCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +30,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog-responsive";
 import { Separator } from "@/components/ui/separator";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
 import { formatPeruDate, formatPeruDateHour } from "@/utils/peru-datetime";
 import { useDialogStore } from "@/hooks/use-dialog-store";
@@ -37,8 +49,9 @@ import {
   PAYMENT_STATUS_LABELS,
   PaymentMethod,
   PaymentStatus,
+  DPayment,
+  Currency,
 } from "../../_types/liquidations.types";
-import { Currency } from "@/app/(admin)/staff/_types/staff.types";
 
 interface LiquidationDetailDialogProps {
   open: boolean;
@@ -310,23 +323,185 @@ export default function LiquidationDetailDialog({
                     <CreditCard className="size-4" />
                     Pagos ({liquidation.payments.length})
                   </h4>
-                  <div className="space-y-2">
-                    {liquidation.payments.map((payment, index) => (
-                      <div
-                        key={index}
-                        className="flex justify-between items-center p-2 bg-muted rounded-md"
-                      >
-                        <span>
-                          {PAYMENT_METHOD_LABELS[
-                            payment.method as PaymentMethod
-                          ] || payment.method}
-                        </span>
-                        <span className="font-mono">
-                          {formatCurrency(payment.amount)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                  <Accordion type="single" collapsible className="w-full">
+                    {liquidation.payments.map((payment, index) => {
+                      // Usamos el tipo extendido DPayment
+                      const paymentData = payment as DPayment;
+                      const isImage = paymentData.evidenceUrl?.match(/\.(jpg|jpeg|png|webp|gif)$/i);
+                      const isPdf = paymentData.evidenceUrl?.match(/\.pdf$/i);
+                      const validationStatusIcon = {
+                        VALID: <CheckCircle className="size-4 text-green-500" />,
+                        PENDING: <Clock className="size-4 text-yellow-500" />,
+                        INVALID: <XCircle className="size-4 text-red-500" />,
+                      };
+                      const validationStatusLabel = {
+                        VALID: "Válido",
+                        PENDING: "Pendiente",
+                        INVALID: "Inválido",
+                      };
+                      
+                      return (
+                        <AccordionItem key={paymentData.id || index} value={`payment-${index}`}>
+                          <AccordionTrigger className="hover:no-underline">
+                            <div className="flex items-center justify-between w-full pr-4">
+                              <div className="flex items-center gap-3">
+                                <CreditCard className="size-4 text-muted-foreground" />
+                                <span className="font-medium">
+                                  {PAYMENT_METHOD_LABELS[paymentData.method as PaymentMethod] || paymentData.method}
+                                </span>
+                                {paymentData.evidenceUrl && (
+                                  <Badge variant="outline" className="text-xs gap-1">
+                                    {isImage ? <ImageIcon className="size-3" /> : <FileText className="size-3" />}
+                                    Evidencia
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <span className="font-mono font-semibold">
+                                  {formatCurrency(paymentData.amount, paymentData.currency)}
+                                </span>
+                                {paymentData.validationStatus && (
+                                  <div className="flex items-center gap-1" title={validationStatusLabel[paymentData.validationStatus as keyof typeof validationStatusLabel]}>
+                                    {validationStatusIcon[paymentData.validationStatus as keyof typeof validationStatusIcon]}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <div className="space-y-3 pt-2">
+                              {/* Detalles del pago */}
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                  <p className="text-muted-foreground">Método</p>
+                                  <p className="font-medium">
+                                    {PAYMENT_METHOD_LABELS[paymentData.method as PaymentMethod] || paymentData.method}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-muted-foreground">Monto</p>
+                                  <p className="font-mono font-medium">
+                                    {formatCurrency(paymentData.amount, paymentData.currency)}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-muted-foreground">Estado de Validación</p>
+                                  <div className="flex items-center gap-1">
+                                    {paymentData.validationStatus && validationStatusIcon[paymentData.validationStatus as keyof typeof validationStatusIcon]}
+                                    <span>{paymentData.validationStatus ? validationStatusLabel[paymentData.validationStatus as keyof typeof validationStatusLabel] : "-"}</span>
+                                  </div>
+                                </div>
+                                {paymentData.createdDate && (
+                                  <div>
+                                    <p className="text-muted-foreground">Fecha de Registro</p>
+                                    <p>{formatPeruDateHour(paymentData.createdDate)}</p>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Evidencia del pago */}
+                              {paymentData.evidenceUrl && (
+                                <div className="mt-4 space-y-2">
+                                  <p className="text-sm font-medium text-muted-foreground">
+                                    Evidencia de Pago
+                                  </p>
+                                  <div className="border rounded-lg overflow-hidden bg-muted/30">
+                                    {isImage ? (
+                                      <div className="relative">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                          src={paymentData.evidenceUrl}
+                                          alt="Evidencia de pago"
+                                          className="w-full max-h-64 object-contain bg-white"
+                                          onError={(e) => {
+                                            // Si la imagen no carga, mostrar placeholder
+                                            const target = e.target as HTMLImageElement;
+                                            target.style.display = "none";
+                                            const fallback = target.nextElementSibling as HTMLElement;
+                                            if (fallback) fallback.style.display = "flex";
+                                          }}
+                                        />
+                                        {/* Fallback cuando la imagen no carga (CORS o URL privada) */}
+                                        <div 
+                                          className="hidden flex-col items-center justify-center p-6 bg-muted/50 min-h-32"
+                                        >
+                                          <ImageIcon className="size-10 text-muted-foreground mb-2" />
+                                          <p className="text-sm text-muted-foreground text-center mb-2">
+                                            Vista previa no disponible
+                                          </p>
+                                          <a
+                                            href={paymentData.evidenceUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                          >
+                                            <Button size="sm" variant="outline" className="gap-1">
+                                              <ExternalLink className="size-3" />
+                                              Abrir imagen
+                                            </Button>
+                                          </a>
+                                        </div>
+                                        <a
+                                          href={paymentData.evidenceUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="absolute top-2 right-2"
+                                        >
+                                          <Button size="sm" variant="secondary" className="gap-1">
+                                            <ExternalLink className="size-3" />
+                                            Abrir
+                                          </Button>
+                                        </a>
+                                      </div>
+                                    ) : isPdf ? (
+                                      <div className="p-4 flex flex-col items-center gap-3">
+                                        <div className="flex items-center gap-2 text-red-600">
+                                          <FileText className="size-8" />
+                                          <span className="font-medium">Documento PDF</span>
+                                        </div>
+                                        <a
+                                          href={paymentData.evidenceUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                        >
+                                          <Button size="sm" variant="outline" className="gap-1">
+                                            <ExternalLink className="size-3" />
+                                            Ver PDF
+                                          </Button>
+                                        </a>
+                                      </div>
+                                    ) : (
+                                      <div className="p-4 flex flex-col items-center gap-3">
+                                        <div className="flex items-center gap-2 text-muted-foreground">
+                                          <FileText className="size-8" />
+                                          <span className="font-medium">Archivo adjunto</span>
+                                        </div>
+                                        <a
+                                          href={paymentData.evidenceUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                        >
+                                          <Button size="sm" variant="outline" className="gap-1">
+                                            <ExternalLink className="size-3" />
+                                            Abrir archivo
+                                          </Button>
+                                        </a>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {!paymentData.evidenceUrl && (
+                                <div className="mt-2 p-3 bg-muted/50 rounded-lg text-center text-sm text-muted-foreground">
+                                  No se adjuntó evidencia de pago
+                                </div>
+                              )}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      );
+                    })}
+                  </Accordion>
                 </div>
               </>
             )}

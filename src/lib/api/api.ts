@@ -658,6 +658,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/liquidations/{liquidationId}/quote-pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar cotización en PDF (solo para estado IN_QUOTE) */
+        get: operations["downloadQuotePdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/liquidations/status/{status}": {
         parameters: {
             query?: never;
@@ -914,9 +931,9 @@ export interface components {
             /** @enum {string} */
             status?: "PENDING" | "COMPLETED" | "CANCELED";
             pending?: boolean;
-            taxed?: boolean;
             pen?: boolean;
             usd?: boolean;
+            taxed?: boolean;
         };
         DCustomer: {
             /** Format: int64 */
@@ -983,9 +1000,9 @@ export interface components {
             flightBookings?: components["schemas"]["DFlightBooking"][];
             /** Format: int32 */
             bookingCount?: number;
-            taxed?: boolean;
             pen?: boolean;
             usd?: boolean;
+            taxed?: boolean;
         };
         DHotelBooking: {
             /** Format: int64 */
@@ -1029,9 +1046,9 @@ export interface components {
             hotelBookings?: components["schemas"]["DHotelBooking"][];
             /** Format: int32 */
             bookingCount?: number;
-            taxed?: boolean;
             pen?: boolean;
             usd?: boolean;
+            taxed?: boolean;
         };
         DIncidency: {
             /** Format: int64 */
@@ -1050,8 +1067,8 @@ export interface components {
             incidencyStatus?: "PENDING" | "APPROVED" | "REJECTED";
             /** Format: int64 */
             liquidationId?: number;
-            pending?: boolean;
             approved?: boolean;
+            pending?: boolean;
         };
         DLiquidation: {
             /** Format: int64 */
@@ -1091,12 +1108,13 @@ export interface components {
             staffId?: number;
             staffOnCharge?: components["schemas"]["DStaff"];
             incidencies?: components["schemas"]["DIncidency"][];
-            overdue?: boolean;
             /** Format: float */
             totalPaid?: number;
             /** Format: float */
             remainingAmount?: number;
+            overdue?: boolean;
         };
+        /** @description Entidad de dominio para pagos */
         DPayment: {
             /** Format: int64 */
             id?: number;
@@ -1105,16 +1123,33 @@ export interface components {
             createdDate?: string;
             /** Format: date-time */
             updatedDate?: string;
-            /** @enum {string} */
+            /**
+             * @description Método de pago utilizado
+             * @enum {string}
+             */
             method?: "DEBIT" | "CREDIT" | "YAPE" | "OTHER";
-            /** Format: float */
+            /**
+             * Format: float
+             * @description Monto del pago
+             */
             amount?: number;
-            /** @enum {string} */
+            /**
+             * @description Moneda del pago (PEN o USD)
+             * @enum {string}
+             */
             currency?: "PEN" | "USD";
-            /** Format: int64 */
+            /**
+             * Format: int64
+             * @description ID de la liquidación asociada
+             */
             liquidationId?: number;
-            /** @enum {string} */
+            /**
+             * @description Estado de validación del pago
+             * @enum {string}
+             */
             validationStatus?: "PENDING" | "VALID" | "INVALID";
+            /** @description URL de la evidencia del pago (imagen o PDF) */
+            evidenceUrl?: string;
             valid?: boolean;
             pending?: boolean;
         };
@@ -1135,9 +1170,9 @@ export interface components {
             tours?: components["schemas"]["DTour"][];
             /** Format: int32 */
             tourCount?: number;
-            taxed?: boolean;
             pen?: boolean;
             usd?: boolean;
+            taxed?: boolean;
         };
         UpdatePaymentDto: {
             payment_method: string;
@@ -1269,11 +1304,30 @@ export interface components {
             currency: string;
             status: string;
         };
+        /** @description DTO para agregar un nuevo pago a una liquidación */
         AddPaymentDto: {
+            /**
+             * @description Método de pago
+             * @example DEBIT
+             */
             payment_method: string;
-            /** Format: float */
+            /**
+             * Format: float
+             * @description Monto del pago
+             * @example 150.5
+             */
             amount: number;
-            currency?: string;
+            /**
+             * @description Moneda del pago
+             * @default PEN
+             * @example PEN
+             */
+            currency: string;
+            /**
+             * @description URL de la evidencia del pago (imagen o PDF)
+             * @example https://example.com/evidence.jpg
+             */
+            evidence_url?: string;
         };
         AddIncidencyDto: {
             reason: string;
@@ -2897,6 +2951,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["DLiquidation"];
+                };
+            };
+        };
+    };
+    downloadQuotePdf: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
                 };
             };
         };

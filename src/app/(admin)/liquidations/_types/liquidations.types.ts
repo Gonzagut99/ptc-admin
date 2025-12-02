@@ -8,7 +8,11 @@ export type PagedModelLiquidationWithDetailsDto = components["schemas"]["PagedMo
 export type PageMetadata = components["schemas"]["PageMetadata"];
 
 // Servicios relacionados
-export type DPayment = components["schemas"]["DPayment"];
+// Extendemos DPayment con campos que pueden no estar en OpenAPI aún
+export type DPayment = components["schemas"]["DPayment"] & {
+  currency?: "PEN" | "USD";
+  evidenceUrl?: string;
+};
 export type DFlightService = components["schemas"]["DFlightService"];
 export type DHotelService = components["schemas"]["DHotelService"];
 export type DTourService = components["schemas"]["DTourService"];

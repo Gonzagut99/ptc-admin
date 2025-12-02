@@ -194,16 +194,16 @@ export async function uploadToR2(file: File): Promise<R2UploadResult> {
       };
     }
     
-    // Construir URL pública (si el bucket tiene acceso público configurado)
-    // Si no, necesitarás configurar un dominio personalizado o usar URLs firmadas
-    const publicUrl = `https://pub-${config.accountId}.r2.dev/${config.bucketName}/${fileName}`;
+    // URL pública del bucket R2
+    // OPCIÓN 1: Dominio público r2.dev (habilitar en Cloudflare Dashboard > R2 > Bucket > Settings > Public Access)
+    // OPCIÓN 2: Dominio personalizado (configurar en Cloudflare Dashboard)
     
-    // Alternativamente, puedes usar la URL del endpoint S3
-    const s3Url = endpoint;
+    // Usar dominio público r2.dev habilitado por el usuario
+    const publicUrl = `https://pub-b2fd193c4de64325b699648daa586288.r2.dev/${fileName}`;
     
     return {
       success: true,
-      url: s3Url, // Usamos la URL S3, ajustar según la configuración de tu bucket
+      url: publicUrl,
     };
   } catch (error) {
     console.error("Error uploading to R2:", error);
