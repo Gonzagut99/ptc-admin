@@ -42,6 +42,8 @@ export const addPaymentSchema = z.object({
   currency: z.enum(["PEN", "USD"], {
     message: "Seleccione una moneda.",
   }),
+
+  evidence_url: z.string().optional(),
 });
 
 // Schema para agregar incidencia
