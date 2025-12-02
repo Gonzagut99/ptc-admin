@@ -29,6 +29,7 @@ import {
   useGetLiquidation,
 } from "../../_hooks/liquidations-hooks";
 import AddPaymentPageDialog from "../../_components/payments/add-payment-page-dialog";
+import { EditPaymentDialog } from "../../_components/payments/edit-payment-dialog";
 import { PAYMENT_METHOD_LABELS, PaymentMethod } from "../../_types/liquidations.types";
 import type { components } from "@/lib/api-java/api-java";
 
@@ -43,7 +44,9 @@ export default function PaymentsPage({ params }: PaymentsPageProps) {
   const liquidationId = Number(id);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<DPayment | null>(null);
+  const [selectedPaymentForEdit, setSelectedPaymentForEdit] = useState<DPayment | null>(null);
 
   const { data: liquidation, isLoading } = useGetLiquidation(liquidationId);
   const { mutate: deactivatePayment, isPending: isDeactivating } =
@@ -72,6 +75,11 @@ export default function PaymentsPage({ params }: PaymentsPageProps) {
   const openDeleteDialog = (payment: DPayment) => {
     setSelectedPayment(payment);
     setDeleteDialogOpen(true);
+  };
+
+  const openEditDialog = (payment: DPayment) => {
+    setSelectedPaymentForEdit(payment);
+    setEditDialogOpen(true);
   };
 
   if (isLoading) {
@@ -143,7 +151,7 @@ export default function PaymentsPage({ params }: PaymentsPageProps) {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem disabled>
+                        <DropdownMenuItem onClick={() => openEditDialog(payment)}>
                           <Pencil className="mr-2 h-4 w-4" />
                           Editar
                         </DropdownMenuItem>
@@ -181,6 +189,14 @@ export default function PaymentsPage({ params }: PaymentsPageProps) {
         destructive
         cancelBtnText="Cancelar"
       />
+      {selectedPaymentForEdit && (
+        <EditPaymentDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          liquidationId={liquidationId}
+          payment={selectedPaymentForEdit}
+        />
+      )}
     </>
   );
 }

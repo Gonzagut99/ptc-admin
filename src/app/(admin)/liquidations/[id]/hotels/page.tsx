@@ -29,6 +29,7 @@ import {
   useGetLiquidation,
 } from "../../_hooks/liquidations-hooks";
 import { AddHotelDialog } from "../../_components/services/add-hotel-dialog";
+import { EditHotelDialog } from "../../_components/services/edit-hotel-dialog";
 import type { components } from "@/lib/api-java/api-java";
 
 type DHotelBooking = components["schemas"]["DHotelBooking"];
@@ -43,7 +44,12 @@ export default function HotelsPage({ params }: HotelsPageProps) {
   const liquidationId = Number(id);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<{
+    booking: DHotelBooking;
+    hotelServiceId: number;
+  } | null>(null);
+  const [selectedBookingForEdit, setSelectedBookingForEdit] = useState<{
     booking: DHotelBooking;
     hotelServiceId: number;
   } | null>(null);
@@ -76,6 +82,11 @@ export default function HotelsPage({ params }: HotelsPageProps) {
   const openDeleteDialog = (booking: DHotelBooking, hotelServiceId: number) => {
     setSelectedBooking({ booking, hotelServiceId });
     setDeleteDialogOpen(true);
+  };
+
+  const openEditDialog = (booking: DHotelBooking, hotelServiceId: number) => {
+    setSelectedBookingForEdit({ booking, hotelServiceId });
+    setEditDialogOpen(true);
   };
 
   if (isLoading) {
@@ -174,7 +185,11 @@ export default function HotelsPage({ params }: HotelsPageProps) {
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem disabled>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  service.id && openEditDialog(booking, service.id)
+                                }
+                              >
                                 <Pencil className="mr-2 h-4 w-4" />
                                 Editar
                               </DropdownMenuItem>
@@ -216,6 +231,15 @@ export default function HotelsPage({ params }: HotelsPageProps) {
         destructive
         cancelBtnText="Cancelar"
       />
+      {selectedBookingForEdit && (
+        <EditHotelDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          liquidationId={liquidationId}
+          hotelServiceId={selectedBookingForEdit.hotelServiceId}
+          booking={selectedBookingForEdit.booking}
+        />
+      )}
     </>
   );
 }

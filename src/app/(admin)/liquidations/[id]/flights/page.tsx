@@ -29,6 +29,7 @@ import {
   useGetLiquidation,
 } from "../../_hooks/liquidations-hooks";
 import { AddFlightDialog } from "../../_components/services/add-flight-dialog";
+import { EditFlightDialog } from "../../_components/services/edit-flight-dialog";
 import type { components } from "@/lib/api-java/api-java";
 
 type DFlightBooking = components["schemas"]["DFlightBooking"];
@@ -43,7 +44,12 @@ export default function FlightsPage({ params }: FlightsPageProps) {
   const liquidationId = Number(id);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<{
+    booking: DFlightBooking;
+    flightServiceId: number;
+  } | null>(null);
+  const [selectedBookingForEdit, setSelectedBookingForEdit] = useState<{
     booking: DFlightBooking;
     flightServiceId: number;
   } | null>(null);
@@ -76,6 +82,11 @@ export default function FlightsPage({ params }: FlightsPageProps) {
   const openDeleteDialog = (booking: DFlightBooking, flightServiceId: number) => {
     setSelectedBooking({ booking, flightServiceId });
     setDeleteDialogOpen(true);
+  };
+
+  const openEditDialog = (booking: DFlightBooking, flightServiceId: number) => {
+    setSelectedBookingForEdit({ booking, flightServiceId });
+    setEditDialogOpen(true);
   };
 
   if (isLoading) {
@@ -176,7 +187,11 @@ export default function FlightsPage({ params }: FlightsPageProps) {
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem disabled>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  service.id && openEditDialog(booking, service.id)
+                                }
+                              >
                                 <Pencil className="mr-2 h-4 w-4" />
                                 Editar
                               </DropdownMenuItem>
@@ -218,6 +233,15 @@ export default function FlightsPage({ params }: FlightsPageProps) {
         destructive
         cancelBtnText="Cancelar"
       />
+      {selectedBookingForEdit && (
+        <EditFlightDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          liquidationId={liquidationId}
+          flightServiceId={selectedBookingForEdit.flightServiceId}
+          booking={selectedBookingForEdit.booking}
+        />
+      )}
     </>
   );
 }

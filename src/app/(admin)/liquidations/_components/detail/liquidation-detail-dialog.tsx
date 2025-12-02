@@ -174,19 +174,43 @@ export default function LiquidationDetailDialog({
 
             <Separator />
 
-            {/* Montos */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="flex items-start gap-3">
-                <DollarSign className="size-5 text-muted-foreground mt-0.5" />
-                <div>
+            {/* Totales por Moneda */}
+            <div className="space-y-4">
+              <h4 className="font-semibold flex items-center gap-2">
+                <DollarSign className="size-5" />
+                Totales
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 bg-muted rounded-lg">
                   <p className="text-sm font-medium text-muted-foreground">
-                    Monto Total
+                    Total en Soles (PEN)
                   </p>
-                  <p className="font-mono text-lg font-bold">
-                    {formatCurrency(liquidation.total_amount)}
+                  <p className="font-mono text-lg font-bold text-emerald-600">
+                    {formatCurrency(liquidation.total_amount, "PEN")}
                   </p>
+                  {liquidation.total_commission_pen !== undefined && liquidation.total_commission_pen !== null && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Comisión: {formatCurrency(liquidation.total_commission_pen, "PEN")}
+                    </p>
+                  )}
+                </div>
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Total en Dólares (USD)
+                  </p>
+                  <p className="font-mono text-lg font-bold text-blue-600">
+                    {formatCurrency(liquidation.total_amount_usd, "USD")}
+                  </p>
+                  {liquidation.total_commission_usd !== undefined && liquidation.total_commission_usd !== null && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Comisión: {formatCurrency(liquidation.total_commission_usd, "USD")}
+                    </p>
+                  )}
                 </div>
               </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
                   Estado de Pago
@@ -203,27 +227,25 @@ export default function LiquidationDetailDialog({
                 </p>
                 <p className="font-mono">{liquidation.currency_rate}</p>
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-start gap-3">
-                <Calendar className="size-5 text-muted-foreground mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Fecha Límite de Pago
-                  </p>
-                  <p>
-                    {liquidation.payment_deadline
-                      ? formatPeruDate(liquidation.payment_deadline)
-                      : "-"}
-                  </p>
-                </div>
-              </div>
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
                   Acompañantes
                 </p>
                 <p>{liquidation.companion ?? 0}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Calendar className="size-5 text-muted-foreground mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Fecha Límite de Pago
+                </p>
+                <p>
+                  {liquidation.payment_deadline
+                    ? formatPeruDate(liquidation.payment_deadline)
+                    : "-"}
+                </p>
               </div>
             </div>
 

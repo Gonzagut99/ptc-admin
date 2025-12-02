@@ -834,259 +834,54 @@ export interface components {
             currency: string;
             status: string;
         };
-        AdditionalServices: {
+        DTour: {
             /** Format: int64 */
             id?: number;
             isActive?: boolean;
             /** Format: date-time */
             createdDate?: string;
-            /** Format: float */
-            tariffRate?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** Format: int64 */
-            liquidationId: number;
+            /** Format: date-time */
+            updatedDate?: string;
+            /** Format: date-time */
+            startDate?: string;
+            /** Format: date-time */
+            endDate?: string;
+            title?: string;
             /** Format: float */
             price?: number;
-            /** @enum {string} */
-            status?: "PENDING" | "COMPLETED" | "CANCELED";
-            liquidation?: unknown;
-            taxed?: boolean;
-        };
-        Customer: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            firstName?: string;
-            lastName?: string;
-            email?: string;
-            phoneNumber?: string;
-            /** Format: date */
-            birthDate?: string;
-            /** @enum {string} */
-            idDocumentType?: "PASSPORT" | "DNI" | "DRIVER_LICENSE" | "RUC" | "CE";
-            idDocumentNumber?: string;
-            address?: string;
-            nationality?: string;
-        };
-        FlightBooking: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            origin: string;
-            destiny: string;
-            /** Format: date-time */
-            departureDate: string;
-            /** Format: date-time */
-            arrivalDate: string;
-            aeroline: string;
-            aerolineBookingCode: string;
-            costamarBookingCode?: string;
-            tktNumbers: string;
-            /** @enum {string} */
-            status?: "PENDING" | "COMPLETED" | "CANCELED";
-            /** Format: float */
-            totalPrice?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** Format: int64 */
-            flightServiceId?: number;
-            flightService?: components["schemas"]["FlightService"];
-        };
-        FlightService: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: float */
-            tariffRate?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** Format: int64 */
-            liquidationId: number;
-            liquidation?: unknown;
-            flightBookings?: components["schemas"]["FlightBooking"][];
-            taxed?: boolean;
-        };
-        HotelBooking: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            checkIn: string;
-            /** Format: date-time */
-            checkOut: string;
-            hotel: string;
-            room: string;
-            roomDescription?: string;
-            /** Format: float */
-            priceByNight?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** @enum {string} */
-            status?: "PENDING" | "COMPLETED" | "CANCELED";
-            /** Format: int64 */
-            hotelServiceId?: number;
-            hotelService?: components["schemas"]["HotelService"];
-        };
-        HotelService: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: float */
-            tariffRate?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** Format: int64 */
-            liquidationId: number;
-            liquidation?: unknown;
-            hotelBookings?: components["schemas"]["HotelBooking"][];
-            taxed?: boolean;
-        };
-        Incidency: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            reason: string;
-            /** Format: float */
-            amount?: number;
-            /** Format: date-time */
-            incidencyDate: string;
-            /** @enum {string} */
-            incidencyStatus?: "PENDING" | "APPROVED" | "REJECTED";
-            /** Format: int64 */
-            liquidationId: number;
-            liquidation?: unknown;
-        };
-        Liquidation: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: float */
-            currencyRate?: number;
-            /** Format: float */
-            totalAmount?: number;
-            /** Format: date-time */
-            paymentDeadline: string;
-            /** Format: int32 */
-            companion?: number;
-            /** @enum {string} */
-            status?: "IN_QUOTE" | "PENDING" | "ON_COURSE" | "COMPLETED";
-            /** @enum {string} */
-            paymentStatus?: "PENDING" | "ON_COURSE" | "COMPLETED";
-            /** Format: int64 */
-            customerId: number;
-            customer?: components["schemas"]["Customer"];
-            /** Format: int64 */
-            staffId: number;
-            staffOnCharge?: components["schemas"]["Staff"];
-            payments?: components["schemas"]["Payment"][];
-            flightServices?: components["schemas"]["FlightService"][];
-            hotelServices?: components["schemas"]["HotelService"][];
-            tourServices?: components["schemas"]["TourService"][];
-            additionalServices?: components["schemas"]["AdditionalServices"][];
-            incidencies?: components["schemas"]["Incidency"][];
-        };
-        Payment: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** @enum {string} */
-            method?: "DEBIT" | "CREDIT" | "YAPE" | "OTHER";
-            /** Format: float */
-            amount?: number;
-            /** Format: int64 */
-            liquidationId: number;
-            /** @enum {string} */
-            validationStatus?: "PENDING" | "VALID" | "INVALID";
-            liquidation?: unknown;
-        };
-        Staff: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            phoneNumber?: string;
-            /** Format: float */
-            salary?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** Format: date-time */
-            hireDate?: string;
-            /** @enum {string} */
-            role?: "SALES" | "COUNTER" | "ACCOUNTING" | "OPERATIONS" | "SUPERADMIN" | "SUPPORT";
-            user?: components["schemas"]["User"];
-        };
-        Tour: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            startDate: string;
-            /** Format: date-time */
-            endDate: string;
-            title: string;
-            /** Format: float */
-            price?: number;
-            place: string;
+            place?: string;
             /** @enum {string} */
             currency?: "PEN" | "USD";
             /** @enum {string} */
             status?: "PENDING" | "COMPLETED" | "CANCELED";
             /** Format: int64 */
             tourServiceId?: number;
-            tourService?: components["schemas"]["TourService"];
-        };
-        TourService: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: float */
-            tariffRate?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** Format: int64 */
-            liquidationId: number;
-            liquidation?: components["schemas"]["Liquidation"];
-            tours?: components["schemas"]["Tour"][];
-            taxed?: boolean;
-        };
-        User: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            userName?: string;
-            email?: string;
-            passwordHash?: string;
-            staff?: components["schemas"]["Staff"];
+            pending?: boolean;
         };
         UpdatePaymentDto: {
             payment_method: string;
             /** Format: float */
             amount: number;
             validation_status: string;
+        };
+        DPayment: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
+            /** @enum {string} */
+            method?: "DEBIT" | "CREDIT" | "YAPE" | "OTHER";
+            /** Format: float */
+            amount?: number;
+            /** Format: int64 */
+            liquidationId?: number;
+            /** @enum {string} */
+            validationStatus?: "PENDING" | "VALID" | "INVALID";
+            valid?: boolean;
+            pending?: boolean;
         };
         UpdateIncidencyDto: {
             reason: string;
@@ -1095,6 +890,26 @@ export interface components {
             /** Format: date-time */
             incidency_date: string;
             incidency_status: string;
+        };
+        DIncidency: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
+            reason?: string;
+            /** Format: float */
+            amount?: number;
+            /** Format: date-time */
+            incidencyDate?: string;
+            /** @enum {string} */
+            incidencyStatus?: "PENDING" | "APPROVED" | "REJECTED";
+            /** Format: int64 */
+            liquidationId?: number;
+            approved?: boolean;
+            pending?: boolean;
         };
         UpdateHotelBookingDto: {
             /** Format: date-time */
@@ -1108,6 +923,31 @@ export interface components {
             price_by_night: number;
             currency: string;
             status: string;
+        };
+        DHotelBooking: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
+            /** Format: date-time */
+            checkIn?: string;
+            /** Format: date-time */
+            checkOut?: string;
+            hotel?: string;
+            room?: string;
+            roomDescription?: string;
+            /** Format: float */
+            priceByNight?: number;
+            /** @enum {string} */
+            currency?: "PEN" | "USD";
+            /** @enum {string} */
+            status?: "PENDING" | "COMPLETED" | "CANCELED";
+            /** Format: int64 */
+            hotelServiceId?: number;
+            pending?: boolean;
         };
         UpdateFlightBookingDto: {
             origin: string;
@@ -1125,6 +965,34 @@ export interface components {
             total_price: number;
             currency: string;
         };
+        DFlightBooking: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
+            origin?: string;
+            destiny?: string;
+            /** Format: date-time */
+            departureDate?: string;
+            /** Format: date-time */
+            arrivalDate?: string;
+            aeroline?: string;
+            aerolineBookingCode?: string;
+            costamarBookingCode?: string;
+            tktNumbers?: string;
+            /** @enum {string} */
+            status?: "PENDING" | "COMPLETED" | "CANCELED";
+            /** Format: float */
+            totalPrice?: number;
+            /** @enum {string} */
+            currency?: "PEN" | "USD";
+            /** Format: int64 */
+            flightServiceId?: number;
+            pending?: boolean;
+        };
         UpdateAdditionalServiceDto: {
             /** Format: float */
             tariff_rate: number;
@@ -1133,6 +1001,29 @@ export interface components {
             /** Format: float */
             price: number;
             status: string;
+        };
+        DAdditionalServices: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
+            /** Format: float */
+            tariffRate?: number;
+            /** @enum {string} */
+            currency?: "PEN" | "USD";
+            /** Format: int64 */
+            liquidationId?: number;
+            /** Format: float */
+            price?: number;
+            /** @enum {string} */
+            status?: "PENDING" | "COMPLETED" | "CANCELED";
+            pending?: boolean;
+            pen?: boolean;
+            usd?: boolean;
+            taxed?: boolean;
         };
         DCustomer: {
             /** Format: int64 */
@@ -1210,55 +1101,6 @@ export interface components {
             /** Format: int64 */
             staff_id: number;
         };
-        DAdditionalServices: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            /** Format: float */
-            tariffRate?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** Format: int64 */
-            liquidationId?: number;
-            /** Format: float */
-            price?: number;
-            /** @enum {string} */
-            status?: "PENDING" | "COMPLETED" | "CANCELED";
-            pending?: boolean;
-            taxed?: boolean;
-        };
-        DFlightBooking: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            origin?: string;
-            destiny?: string;
-            /** Format: date-time */
-            departureDate?: string;
-            /** Format: date-time */
-            arrivalDate?: string;
-            aeroline?: string;
-            aerolineBookingCode?: string;
-            costamarBookingCode?: string;
-            tktNumbers?: string;
-            /** @enum {string} */
-            status?: "PENDING" | "COMPLETED" | "CANCELED";
-            /** Format: float */
-            totalPrice?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** Format: int64 */
-            flightServiceId?: number;
-            pending?: boolean;
-        };
         DFlightService: {
             /** Format: int64 */
             id?: number;
@@ -1276,32 +1118,9 @@ export interface components {
             flightBookings?: components["schemas"]["DFlightBooking"][];
             /** Format: int32 */
             bookingCount?: number;
+            pen?: boolean;
+            usd?: boolean;
             taxed?: boolean;
-        };
-        DHotelBooking: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            /** Format: date-time */
-            checkIn?: string;
-            /** Format: date-time */
-            checkOut?: string;
-            hotel?: string;
-            room?: string;
-            roomDescription?: string;
-            /** Format: float */
-            priceByNight?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** @enum {string} */
-            status?: "PENDING" | "COMPLETED" | "CANCELED";
-            /** Format: int64 */
-            hotelServiceId?: number;
-            pending?: boolean;
         };
         DHotelService: {
             /** Format: int64 */
@@ -1320,27 +1139,9 @@ export interface components {
             hotelBookings?: components["schemas"]["DHotelBooking"][];
             /** Format: int32 */
             bookingCount?: number;
+            pen?: boolean;
+            usd?: boolean;
             taxed?: boolean;
-        };
-        DIncidency: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            reason?: string;
-            /** Format: float */
-            amount?: number;
-            /** Format: date-time */
-            incidencyDate?: string;
-            /** @enum {string} */
-            incidencyStatus?: "PENDING" | "APPROVED" | "REJECTED";
-            /** Format: int64 */
-            liquidationId?: number;
-            pending?: boolean;
-            approved?: boolean;
         };
         DLiquidation: {
             /** Format: int64 */
@@ -1354,6 +1155,12 @@ export interface components {
             currencyRate?: number;
             /** Format: float */
             totalAmount?: number;
+            /** Format: float */
+            totalAmountUSD?: number;
+            /** Format: float */
+            totalCommissionPEN?: number;
+            /** Format: float */
+            totalCommissionUSD?: number;
             /** Format: date-time */
             paymentDeadline?: string;
             /** Format: int32 */
@@ -1374,54 +1181,11 @@ export interface components {
             staffId?: number;
             staffOnCharge?: components["schemas"]["DStaff"];
             incidencies?: components["schemas"]["DIncidency"][];
-            /** Format: float */
-            remainingAmount?: number;
+            overdue?: boolean;
             /** Format: float */
             totalPaid?: number;
-            overdue?: boolean;
-        };
-        DPayment: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            /** @enum {string} */
-            method?: "DEBIT" | "CREDIT" | "YAPE" | "OTHER";
             /** Format: float */
-            amount?: number;
-            /** Format: int64 */
-            liquidationId?: number;
-            /** @enum {string} */
-            validationStatus?: "PENDING" | "VALID" | "INVALID";
-            valid?: boolean;
-            pending?: boolean;
-        };
-        DTour: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            /** Format: date-time */
-            startDate?: string;
-            /** Format: date-time */
-            endDate?: string;
-            title?: string;
-            /** Format: float */
-            price?: number;
-            place?: string;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** @enum {string} */
-            status?: "PENDING" | "COMPLETED" | "CANCELED";
-            /** Format: int64 */
-            tourServiceId?: number;
-            pending?: boolean;
+            remainingAmount?: number;
         };
         DTourService: {
             /** Format: int64 */
@@ -1440,6 +1204,8 @@ export interface components {
             tours?: components["schemas"]["DTour"][];
             /** Format: int32 */
             tourCount?: number;
+            pen?: boolean;
+            usd?: boolean;
             taxed?: boolean;
         };
         AddTourServiceDto: {
@@ -1658,6 +1424,12 @@ export interface components {
             currency_rate?: number;
             /** Format: float */
             total_amount?: number;
+            /** Format: float */
+            total_amount_usd?: number;
+            /** Format: float */
+            total_commission_pen?: number;
+            /** Format: float */
+            total_commission_usd?: number;
             /** Format: date-time */
             payment_deadline?: string;
             /** Format: int32 */
@@ -1975,7 +1747,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Tour"];
+                    "*/*": components["schemas"]["DTour"];
                 };
             };
         };
@@ -1999,7 +1771,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Tour"];
+                    "*/*": components["schemas"]["DTour"];
                 };
             };
         };
@@ -2026,7 +1798,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Payment"];
+                    "*/*": components["schemas"]["DPayment"];
                 };
             };
         };
@@ -2049,7 +1821,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Payment"];
+                    "*/*": components["schemas"]["DPayment"];
                 };
             };
         };
@@ -2076,7 +1848,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Incidency"];
+                    "*/*": components["schemas"]["DIncidency"];
                 };
             };
         };
@@ -2099,7 +1871,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Incidency"];
+                    "*/*": components["schemas"]["DIncidency"];
                 };
             };
         };
@@ -2127,7 +1899,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["HotelBooking"];
+                    "*/*": components["schemas"]["DHotelBooking"];
                 };
             };
         };
@@ -2151,7 +1923,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["HotelBooking"];
+                    "*/*": components["schemas"]["DHotelBooking"];
                 };
             };
         };
@@ -2179,7 +1951,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["FlightBooking"];
+                    "*/*": components["schemas"]["DFlightBooking"];
                 };
             };
         };
@@ -2203,7 +1975,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["FlightBooking"];
+                    "*/*": components["schemas"]["DFlightBooking"];
                 };
             };
         };
@@ -2230,7 +2002,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["AdditionalServices"];
+                    "*/*": components["schemas"]["DAdditionalServices"];
                 };
             };
         };
@@ -2253,7 +2025,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["AdditionalServices"];
+                    "*/*": components["schemas"]["DAdditionalServices"];
                 };
             };
         };
@@ -3029,7 +2801,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Liquidation"];
+                    "*/*": components["schemas"]["DLiquidation"];
                 };
             };
         };

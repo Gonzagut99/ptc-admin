@@ -29,6 +29,7 @@ import {
   useGetLiquidation,
 } from "../../_hooks/liquidations-hooks";
 import { AddAdditionalDialog } from "../../_components/services/add-additional-dialog";
+import { EditAdditionalDialog } from "../../_components/services/edit-additional-dialog";
 import type { components } from "@/lib/api-java/api-java";
 
 type DAdditionalServices = components["schemas"]["DAdditionalServices"];
@@ -42,7 +43,9 @@ export default function AdditionalsPage({ params }: AdditionalsPageProps) {
   const liquidationId = Number(id);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<DAdditionalServices | null>(null);
+  const [selectedServiceForEdit, setSelectedServiceForEdit] = useState<DAdditionalServices | null>(null);
 
   const { data: liquidation, isLoading } = useGetLiquidation(liquidationId);
   const { mutate: deactivateService, isPending: isDeactivating } =
@@ -71,6 +74,11 @@ export default function AdditionalsPage({ params }: AdditionalsPageProps) {
   const openDeleteDialog = (service: DAdditionalServices) => {
     setSelectedService(service);
     setDeleteDialogOpen(true);
+  };
+
+  const openEditDialog = (service: DAdditionalServices) => {
+    setSelectedServiceForEdit(service);
+    setEditDialogOpen(true);
   };
 
   if (isLoading) {
@@ -156,7 +164,7 @@ export default function AdditionalsPage({ params }: AdditionalsPageProps) {
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem disabled>
+                          <DropdownMenuItem onClick={() => openEditDialog(service)}>
                             <Pencil className="mr-2 h-4 w-4" />
                             Editar
                           </DropdownMenuItem>
@@ -194,6 +202,14 @@ export default function AdditionalsPage({ params }: AdditionalsPageProps) {
         destructive
         cancelBtnText="Cancelar"
       />
+      {selectedServiceForEdit && (
+        <EditAdditionalDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          liquidationId={liquidationId}
+          service={selectedServiceForEdit}
+        />
+      )}
     </>
   );
 }

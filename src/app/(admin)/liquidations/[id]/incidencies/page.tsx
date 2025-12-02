@@ -28,6 +28,7 @@ import {
   useGetLiquidation,
 } from "../../_hooks/liquidations-hooks";
 import AddIncidencyPageDialog from "../../_components/incidencies/add-incidency-page-dialog";
+import { EditIncidencyDialog } from "../../_components/incidencies/edit-incidency-dialog";
 import type { components } from "@/lib/api-java/api-java";
 import { toast } from "sonner";
 
@@ -42,7 +43,9 @@ export default function IncidenciesPage({ params }: IncidenciesPageProps) {
   const liquidationId = Number(id);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedIncidency, setSelectedIncidency] = useState<DIncidency | null>(null);
+  const [selectedIncidencyForEdit, setSelectedIncidencyForEdit] = useState<DIncidency | null>(null);
 
   const { data: liquidation, isLoading } = useGetLiquidation(liquidationId);
   const { mutate: deactivateIncidency, isPending: isDeactivating } =
@@ -71,6 +74,11 @@ export default function IncidenciesPage({ params }: IncidenciesPageProps) {
   const openDeleteDialog = (incidency: DIncidency) => {
     setSelectedIncidency(incidency);
     setDeleteDialogOpen(true);
+  };
+
+  const openEditDialog = (incidency: DIncidency) => {
+    setSelectedIncidencyForEdit(incidency);
+    setEditDialogOpen(true);
   };
 
   if (isLoading) {
@@ -144,7 +152,7 @@ export default function IncidenciesPage({ params }: IncidenciesPageProps) {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem disabled>
+                        <DropdownMenuItem onClick={() => openEditDialog(incidency)}>
                           <Pencil className="mr-2 h-4 w-4" />
                           Editar
                         </DropdownMenuItem>
@@ -186,6 +194,14 @@ export default function IncidenciesPage({ params }: IncidenciesPageProps) {
         destructive
         cancelBtnText="Cancelar"
       />
+      {selectedIncidencyForEdit && (
+        <EditIncidencyDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          liquidationId={liquidationId}
+          incidency={selectedIncidencyForEdit}
+        />
+      )}
     </>
   );
 }

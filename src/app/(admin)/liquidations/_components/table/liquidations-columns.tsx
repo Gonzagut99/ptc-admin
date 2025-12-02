@@ -98,15 +98,18 @@ export const liquidationsColumns = (): ColumnDef<LiquidationWithDetailsDto>[] =>
     id: "montoTotal",
     accessorKey: "total_amount",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Monto Total" />
+      <DataTableColumnHeader column={column} title="Totales" />
     ),
     cell: ({ row }) => {
-      const amount = row.getValue("montoTotal") as number | undefined;
+      const amountPEN = row.getValue("montoTotal") as number | undefined;
+      const amountUSD = row.original.total_amount_usd;
       return (
-        <div className="flex items-center gap-2">
-          {/* <DollarSign className="size-4 text-muted-foreground" /> */}
-          <span className="font-mono">
-            {amount ? `S/ ${amount.toFixed(2)}` : "-"}
+        <div className="flex flex-col gap-0.5">
+          <span className="font-mono text-sm text-emerald-600">
+            {amountPEN !== undefined && amountPEN !== null ? `S/ ${amountPEN.toFixed(2)}` : "-"}
+          </span>
+          <span className="font-mono text-xs text-blue-600">
+            {amountUSD !== undefined && amountUSD !== null ? `$ ${amountUSD.toFixed(2)}` : "-"}
           </span>
         </div>
       );

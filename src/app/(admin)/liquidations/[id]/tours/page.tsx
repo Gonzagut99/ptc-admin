@@ -42,6 +42,7 @@ export default function ToursPage({ params }: ToursPageProps) {
   const { id } = use(params);
   const liquidationId = Number(id);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [_editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedTour, setSelectedTour] = useState<{
     tour: DTour;
@@ -71,6 +72,11 @@ export default function ToursPage({ params }: ToursPageProps) {
         },
       },
     );
+  };
+
+  const openEditDialog = (tour: DTour, tourServiceId: number) => {
+    setSelectedTour({ tour, tourServiceId });
+    setEditDialogOpen(true);
   };
 
   const openDeleteDialog = (tour: DTour, tourServiceId: number) => {
@@ -172,7 +178,11 @@ export default function ToursPage({ params }: ToursPageProps) {
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem disabled>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  service.id && openEditDialog(tour, service.id)
+                                }
+                              >
                                 <Pencil className="mr-2 h-4 w-4" />
                                 Editar
                               </DropdownMenuItem>
