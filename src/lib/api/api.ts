@@ -95,6 +95,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/liquidations/{liquidationId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Actualizar estado de la liquidación */
+        put: operations["updateLiquidationStatus"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/liquidations/{liquidationId}/payments/{paymentId}": {
         parameters: {
             query?: never;
@@ -108,6 +125,23 @@ export interface paths {
         post?: never;
         /** Desactivar (soft delete) un pago */
         delete: operations["deactivatePayment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/liquidations/{liquidationId}/payment-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Actualizar estado de pago de la liquidación */
+        put: operations["updatePaymentStatus"];
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -834,31 +868,64 @@ export interface components {
             currency: string;
             status: string;
         };
-        AdditionalServices: {
+        DTour: {
             /** Format: int64 */
             id?: number;
             isActive?: boolean;
             /** Format: date-time */
             createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
+            /** Format: date-time */
+            startDate?: string;
+            /** Format: date-time */
+            endDate?: string;
+            title?: string;
+            /** Format: float */
+            price?: number;
+            place?: string;
+            /** @enum {string} */
+            currency?: "PEN" | "USD";
+            /** @enum {string} */
+            status?: "PENDING" | "COMPLETED" | "CANCELED";
+            /** Format: int64 */
+            tourServiceId?: number;
+            pending?: boolean;
+        };
+        UpdateLiquidationStatusDto: {
+            target_status: string;
+        };
+        DAdditionalServices: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
             /** Format: float */
             tariffRate?: number;
             /** @enum {string} */
             currency?: "PEN" | "USD";
             /** Format: int64 */
-            liquidationId: number;
+            liquidationId?: number;
             /** Format: float */
             price?: number;
             /** @enum {string} */
             status?: "PENDING" | "COMPLETED" | "CANCELED";
-            liquidation?: unknown;
+            pending?: boolean;
             taxed?: boolean;
+            pen?: boolean;
+            usd?: boolean;
         };
-        Customer: {
+        DCustomer: {
             /** Format: int64 */
             id?: number;
             isActive?: boolean;
             /** Format: date-time */
             createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
             firstName?: string;
             lastName?: string;
             email?: string;
@@ -871,22 +938,24 @@ export interface components {
             address?: string;
             nationality?: string;
         };
-        FlightBooking: {
+        DFlightBooking: {
             /** Format: int64 */
             id?: number;
             isActive?: boolean;
             /** Format: date-time */
             createdDate?: string;
-            origin: string;
-            destiny: string;
             /** Format: date-time */
-            departureDate: string;
+            updatedDate?: string;
+            origin?: string;
+            destiny?: string;
             /** Format: date-time */
-            arrivalDate: string;
-            aeroline: string;
-            aerolineBookingCode: string;
+            departureDate?: string;
+            /** Format: date-time */
+            arrivalDate?: string;
+            aeroline?: string;
+            aerolineBookingCode?: string;
             costamarBookingCode?: string;
-            tktNumbers: string;
+            tktNumbers?: string;
             /** @enum {string} */
             status?: "PENDING" | "COMPLETED" | "CANCELED";
             /** Format: float */
@@ -895,36 +964,43 @@ export interface components {
             currency?: "PEN" | "USD";
             /** Format: int64 */
             flightServiceId?: number;
-            flightService?: components["schemas"]["FlightService"];
+            pending?: boolean;
         };
-        FlightService: {
+        DFlightService: {
             /** Format: int64 */
             id?: number;
             isActive?: boolean;
             /** Format: date-time */
             createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
             /** Format: float */
             tariffRate?: number;
             /** @enum {string} */
             currency?: "PEN" | "USD";
             /** Format: int64 */
-            liquidationId: number;
-            liquidation?: unknown;
-            flightBookings?: components["schemas"]["FlightBooking"][];
+            liquidationId?: number;
+            flightBookings?: components["schemas"]["DFlightBooking"][];
+            /** Format: int32 */
+            bookingCount?: number;
             taxed?: boolean;
+            pen?: boolean;
+            usd?: boolean;
         };
-        HotelBooking: {
+        DHotelBooking: {
             /** Format: int64 */
             id?: number;
             isActive?: boolean;
             /** Format: date-time */
             createdDate?: string;
             /** Format: date-time */
-            checkIn: string;
+            updatedDate?: string;
             /** Format: date-time */
-            checkOut: string;
-            hotel: string;
-            room: string;
+            checkIn?: string;
+            /** Format: date-time */
+            checkOut?: string;
+            hotel?: string;
+            room?: string;
             roomDescription?: string;
             /** Format: float */
             priceByNight?: number;
@@ -934,159 +1010,143 @@ export interface components {
             status?: "PENDING" | "COMPLETED" | "CANCELED";
             /** Format: int64 */
             hotelServiceId?: number;
-            hotelService?: components["schemas"]["HotelService"];
+            pending?: boolean;
         };
-        HotelService: {
+        DHotelService: {
             /** Format: int64 */
             id?: number;
             isActive?: boolean;
             /** Format: date-time */
             createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
             /** Format: float */
             tariffRate?: number;
             /** @enum {string} */
             currency?: "PEN" | "USD";
             /** Format: int64 */
-            liquidationId: number;
-            liquidation?: unknown;
-            hotelBookings?: components["schemas"]["HotelBooking"][];
+            liquidationId?: number;
+            hotelBookings?: components["schemas"]["DHotelBooking"][];
+            /** Format: int32 */
+            bookingCount?: number;
             taxed?: boolean;
+            pen?: boolean;
+            usd?: boolean;
         };
-        Incidency: {
+        DIncidency: {
             /** Format: int64 */
             id?: number;
             isActive?: boolean;
             /** Format: date-time */
             createdDate?: string;
-            reason: string;
+            /** Format: date-time */
+            updatedDate?: string;
+            reason?: string;
             /** Format: float */
             amount?: number;
             /** Format: date-time */
-            incidencyDate: string;
+            incidencyDate?: string;
             /** @enum {string} */
             incidencyStatus?: "PENDING" | "APPROVED" | "REJECTED";
             /** Format: int64 */
-            liquidationId: number;
-            liquidation?: unknown;
+            liquidationId?: number;
+            pending?: boolean;
+            approved?: boolean;
         };
-        Liquidation: {
+        DLiquidation: {
             /** Format: int64 */
             id?: number;
             isActive?: boolean;
             /** Format: date-time */
             createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
             /** Format: float */
             currencyRate?: number;
             /** Format: float */
             totalAmount?: number;
+            /** Format: float */
+            totalAmountUSD?: number;
+            /** Format: float */
+            totalCommissionPEN?: number;
+            /** Format: float */
+            totalCommissionUSD?: number;
             /** Format: date-time */
-            paymentDeadline: string;
+            paymentDeadline?: string;
             /** Format: int32 */
             companion?: number;
             /** @enum {string} */
             status?: "IN_QUOTE" | "PENDING" | "ON_COURSE" | "COMPLETED";
+            payments?: components["schemas"]["DPayment"][];
             /** @enum {string} */
             paymentStatus?: "PENDING" | "ON_COURSE" | "COMPLETED";
+            flightServices?: components["schemas"]["DFlightService"][];
+            hotelServices?: components["schemas"]["DHotelService"][];
+            tourServices?: components["schemas"]["DTourService"][];
+            additionalServices?: components["schemas"]["DAdditionalServices"][];
             /** Format: int64 */
-            customerId: number;
-            customer?: components["schemas"]["Customer"];
+            customerId?: number;
+            customer?: components["schemas"]["DCustomer"];
             /** Format: int64 */
-            staffId: number;
-            staffOnCharge?: components["schemas"]["Staff"];
-            payments?: components["schemas"]["Payment"][];
-            flightServices?: components["schemas"]["FlightService"][];
-            hotelServices?: components["schemas"]["HotelService"][];
-            tourServices?: components["schemas"]["TourService"][];
-            additionalServices?: components["schemas"]["AdditionalServices"][];
-            incidencies?: components["schemas"]["Incidency"][];
+            staffId?: number;
+            staffOnCharge?: components["schemas"]["DStaff"];
+            incidencies?: components["schemas"]["DIncidency"][];
+            overdue?: boolean;
+            /** Format: float */
+            totalPaid?: number;
+            /** Format: float */
+            remainingAmount?: number;
         };
-        Payment: {
+        DPayment: {
             /** Format: int64 */
             id?: number;
             isActive?: boolean;
             /** Format: date-time */
             createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
             /** @enum {string} */
             method?: "DEBIT" | "CREDIT" | "YAPE" | "OTHER";
             /** Format: float */
             amount?: number;
+            /** @enum {string} */
+            currency?: "PEN" | "USD";
             /** Format: int64 */
-            liquidationId: number;
+            liquidationId?: number;
             /** @enum {string} */
             validationStatus?: "PENDING" | "VALID" | "INVALID";
-            liquidation?: unknown;
+            valid?: boolean;
+            pending?: boolean;
         };
-        Staff: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            phoneNumber?: string;
-            /** Format: float */
-            salary?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** Format: date-time */
-            hireDate?: string;
-            /** @enum {string} */
-            role?: "SALES" | "COUNTER" | "ACCOUNTING" | "OPERATIONS" | "SUPERADMIN" | "SUPPORT";
-            user?: components["schemas"]["User"];
-        };
-        Tour: {
+        DTourService: {
             /** Format: int64 */
             id?: number;
             isActive?: boolean;
             /** Format: date-time */
             createdDate?: string;
             /** Format: date-time */
-            startDate: string;
-            /** Format: date-time */
-            endDate: string;
-            title: string;
-            /** Format: float */
-            price?: number;
-            place: string;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** @enum {string} */
-            status?: "PENDING" | "COMPLETED" | "CANCELED";
-            /** Format: int64 */
-            tourServiceId?: number;
-            tourService?: components["schemas"]["TourService"];
-        };
-        TourService: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
+            updatedDate?: string;
             /** Format: float */
             tariffRate?: number;
             /** @enum {string} */
             currency?: "PEN" | "USD";
             /** Format: int64 */
-            liquidationId: number;
-            liquidation?: components["schemas"]["Liquidation"];
-            tours?: components["schemas"]["Tour"][];
+            liquidationId?: number;
+            tours?: components["schemas"]["DTour"][];
+            /** Format: int32 */
+            tourCount?: number;
             taxed?: boolean;
-        };
-        User: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            userName?: string;
-            email?: string;
-            passwordHash?: string;
-            staff?: components["schemas"]["Staff"];
+            pen?: boolean;
+            usd?: boolean;
         };
         UpdatePaymentDto: {
             payment_method: string;
             /** Format: float */
             amount: number;
             validation_status: string;
+        };
+        UpdatePaymentStatusDto: {
+            target_status: string;
         };
         UpdateIncidencyDto: {
             reason: string;
@@ -1133,26 +1193,6 @@ export interface components {
             /** Format: float */
             price: number;
             status: string;
-        };
-        DCustomer: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            firstName?: string;
-            lastName?: string;
-            email?: string;
-            phoneNumber?: string;
-            /** Format: date */
-            birthDate?: string;
-            /** @enum {string} */
-            idDocumentType?: "PASSPORT" | "DNI" | "DRIVER_LICENSE" | "RUC" | "CE";
-            idDocumentNumber?: string;
-            address?: string;
-            nationality?: string;
         };
         UpdateCustomerDto: {
             firstName?: string;
@@ -1210,238 +1250,6 @@ export interface components {
             /** Format: int64 */
             staff_id: number;
         };
-        DAdditionalServices: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            /** Format: float */
-            tariffRate?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** Format: int64 */
-            liquidationId?: number;
-            /** Format: float */
-            price?: number;
-            /** @enum {string} */
-            status?: "PENDING" | "COMPLETED" | "CANCELED";
-            pending?: boolean;
-            taxed?: boolean;
-        };
-        DFlightBooking: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            origin?: string;
-            destiny?: string;
-            /** Format: date-time */
-            departureDate?: string;
-            /** Format: date-time */
-            arrivalDate?: string;
-            aeroline?: string;
-            aerolineBookingCode?: string;
-            costamarBookingCode?: string;
-            tktNumbers?: string;
-            /** @enum {string} */
-            status?: "PENDING" | "COMPLETED" | "CANCELED";
-            /** Format: float */
-            totalPrice?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** Format: int64 */
-            flightServiceId?: number;
-            pending?: boolean;
-        };
-        DFlightService: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            /** Format: float */
-            tariffRate?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** Format: int64 */
-            liquidationId?: number;
-            flightBookings?: components["schemas"]["DFlightBooking"][];
-            /** Format: int32 */
-            bookingCount?: number;
-            taxed?: boolean;
-        };
-        DHotelBooking: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            /** Format: date-time */
-            checkIn?: string;
-            /** Format: date-time */
-            checkOut?: string;
-            hotel?: string;
-            room?: string;
-            roomDescription?: string;
-            /** Format: float */
-            priceByNight?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** @enum {string} */
-            status?: "PENDING" | "COMPLETED" | "CANCELED";
-            /** Format: int64 */
-            hotelServiceId?: number;
-            pending?: boolean;
-        };
-        DHotelService: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            /** Format: float */
-            tariffRate?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** Format: int64 */
-            liquidationId?: number;
-            hotelBookings?: components["schemas"]["DHotelBooking"][];
-            /** Format: int32 */
-            bookingCount?: number;
-            taxed?: boolean;
-        };
-        DIncidency: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            reason?: string;
-            /** Format: float */
-            amount?: number;
-            /** Format: date-time */
-            incidencyDate?: string;
-            /** @enum {string} */
-            incidencyStatus?: "PENDING" | "APPROVED" | "REJECTED";
-            /** Format: int64 */
-            liquidationId?: number;
-            pending?: boolean;
-            approved?: boolean;
-        };
-        DLiquidation: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            /** Format: float */
-            currencyRate?: number;
-            /** Format: float */
-            totalAmount?: number;
-            /** Format: date-time */
-            paymentDeadline?: string;
-            /** Format: int32 */
-            companion?: number;
-            /** @enum {string} */
-            status?: "IN_QUOTE" | "PENDING" | "ON_COURSE" | "COMPLETED";
-            payments?: components["schemas"]["DPayment"][];
-            /** @enum {string} */
-            paymentStatus?: "PENDING" | "ON_COURSE" | "COMPLETED";
-            flightServices?: components["schemas"]["DFlightService"][];
-            hotelServices?: components["schemas"]["DHotelService"][];
-            tourServices?: components["schemas"]["DTourService"][];
-            additionalServices?: components["schemas"]["DAdditionalServices"][];
-            /** Format: int64 */
-            customerId?: number;
-            customer?: components["schemas"]["DCustomer"];
-            /** Format: int64 */
-            staffId?: number;
-            staffOnCharge?: components["schemas"]["DStaff"];
-            incidencies?: components["schemas"]["DIncidency"][];
-            overdue?: boolean;
-            /** Format: float */
-            remainingAmount?: number;
-            /** Format: float */
-            totalPaid?: number;
-        };
-        DPayment: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            /** @enum {string} */
-            method?: "DEBIT" | "CREDIT" | "YAPE" | "OTHER";
-            /** Format: float */
-            amount?: number;
-            /** Format: int64 */
-            liquidationId?: number;
-            /** @enum {string} */
-            validationStatus?: "PENDING" | "VALID" | "INVALID";
-            valid?: boolean;
-            pending?: boolean;
-        };
-        DTour: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            /** Format: date-time */
-            startDate?: string;
-            /** Format: date-time */
-            endDate?: string;
-            title?: string;
-            /** Format: float */
-            price?: number;
-            place?: string;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** @enum {string} */
-            status?: "PENDING" | "COMPLETED" | "CANCELED";
-            /** Format: int64 */
-            tourServiceId?: number;
-            pending?: boolean;
-        };
-        DTourService: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            /** Format: float */
-            tariffRate?: number;
-            /** @enum {string} */
-            currency?: "PEN" | "USD";
-            /** Format: int64 */
-            liquidationId?: number;
-            tours?: components["schemas"]["DTour"][];
-            /** Format: int32 */
-            tourCount?: number;
-            taxed?: boolean;
-        };
         AddTourServiceDto: {
             /** Format: float */
             tariff_rate: number;
@@ -1465,6 +1273,7 @@ export interface components {
             payment_method: string;
             /** Format: float */
             amount: number;
+            currency?: string;
         };
         AddIncidencyDto: {
             reason: string;
@@ -1658,6 +1467,12 @@ export interface components {
             currency_rate?: number;
             /** Format: float */
             total_amount?: number;
+            /** Format: float */
+            total_amount_usd?: number;
+            /** Format: float */
+            total_commission_pen?: number;
+            /** Format: float */
+            total_commission_usd?: number;
             /** Format: date-time */
             payment_deadline?: string;
             /** Format: int32 */
@@ -1975,7 +1790,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Tour"];
+                    "*/*": components["schemas"]["DTour"];
                 };
             };
         };
@@ -1999,7 +1814,33 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Tour"];
+                    "*/*": components["schemas"]["DTour"];
+                };
+            };
+        };
+    };
+    updateLiquidationStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateLiquidationStatusDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DLiquidation"];
                 };
             };
         };
@@ -2026,7 +1867,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Payment"];
+                    "*/*": components["schemas"]["DPayment"];
                 };
             };
         };
@@ -2049,7 +1890,33 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Payment"];
+                    "*/*": components["schemas"]["DPayment"];
+                };
+            };
+        };
+    };
+    updatePaymentStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePaymentStatusDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DLiquidation"];
                 };
             };
         };
@@ -2076,7 +1943,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Incidency"];
+                    "*/*": components["schemas"]["DIncidency"];
                 };
             };
         };
@@ -2099,7 +1966,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Incidency"];
+                    "*/*": components["schemas"]["DIncidency"];
                 };
             };
         };
@@ -2127,7 +1994,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["HotelBooking"];
+                    "*/*": components["schemas"]["DHotelBooking"];
                 };
             };
         };
@@ -2151,7 +2018,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["HotelBooking"];
+                    "*/*": components["schemas"]["DHotelBooking"];
                 };
             };
         };
@@ -2179,7 +2046,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["FlightBooking"];
+                    "*/*": components["schemas"]["DFlightBooking"];
                 };
             };
         };
@@ -2203,7 +2070,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["FlightBooking"];
+                    "*/*": components["schemas"]["DFlightBooking"];
                 };
             };
         };
@@ -2230,7 +2097,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["AdditionalServices"];
+                    "*/*": components["schemas"]["DAdditionalServices"];
                 };
             };
         };
@@ -2253,7 +2120,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["AdditionalServices"];
+                    "*/*": components["schemas"]["DAdditionalServices"];
                 };
             };
         };
@@ -3029,7 +2896,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Liquidation"];
+                    "*/*": components["schemas"]["DLiquidation"];
                 };
             };
         };

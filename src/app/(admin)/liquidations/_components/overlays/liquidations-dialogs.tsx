@@ -10,6 +10,8 @@ import LiquidationDetailDialog from "../detail/liquidation-detail-dialog";
 import AddIncidencyDialog from "../incidencies/add-incidency-dialog";
 import AddPaymentDialog from "../payments/add-payment-dialog";
 import AddServiceDialog from "../services/add-service-dialog";
+import UpdateLiquidationStatusDialog from "./update-liquidation-status-dialog";
+import UpdatePaymentStatusDialog from "./update-payment-status-dialog";
 
 export const MODULE_LIQUIDATIONS = "java-liquidations";
 
@@ -65,6 +67,20 @@ export default function LiquidationsDialogs() {
       {type === "add-incidency" && liquidation && (
         <AddIncidencyDialog
           open={isOpenForModule(MODULE_LIQUIDATIONS, "add-incidency")}
+          onOpenChange={close}
+          liquidation={liquidation}
+        />
+      )}
+      {type === "update-status" && liquidation && (
+        <UpdateLiquidationStatusDialog
+          open={isOpenForModule(MODULE_LIQUIDATIONS, "update-status")}
+          onOpenChange={close}
+          liquidation={liquidation}
+        />
+      )}
+      {type === "update-payment-status" && liquidation && (
+        <UpdatePaymentStatusDialog
+          open={isOpenForModule(MODULE_LIQUIDATIONS, "update-payment-status")}
           onOpenChange={close}
           liquidation={liquidation}
         />

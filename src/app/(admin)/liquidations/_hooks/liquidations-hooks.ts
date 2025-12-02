@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { useZeroBasedPagination } from "@/hooks/use-zero-based-pagination";
+import { getAccessToken } from "@/lib/api-java/auth-client";
 import { backendJava } from "@/lib/api-java/backend";
 import { buildJavaErrorMessage } from "@/lib/api-java/errors";
 import {
@@ -633,4 +634,114 @@ export const useUpdateIncidency = (liquidationId: number) => {
       },
     },
   );
+};
+
+// ==================== STATUS TRANSITION HOOKS ====================
+
+export const useUpdateLiquidationStatus = (liquidationId: number) => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "put",
+    "/liquidations/{liquidationId}/status",
+    {
+      onSuccess: () => {
+        invalidateLiquidationQueries(queryClient, liquidationId);
+        toast.success("Estado de liquidación actualizado correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al actualizar el estado de la liquidación",
+          ),
+        );
+      },
+    },
+  );
+};
+
+export const useUpdatePaymentStatus = (liquidationId: number) => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "put",
+    "/liquidations/{liquidationId}/payment-status",
+    {
+      onSuccess: () => {
+        invalidateLiquidationQueries(queryClient, liquidationId);
+        toast.success("Estado de pago actualizado correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al actualizar el estado de pago",
+          ),
+        );
+      },
+    },
+  );
+};
+
+// Función para descargar el PDF de cotización
+export const downloadQuotePdf = async (liquidationId: number) => {
+  const JAVA_BACKEND_URL =
+    process.env.NEXT_PUBLIC_JAVA_API_URL ?? process.env.NEXT_PUBLIC_API_URL;
+
+  if (!JAVA_BACKEND_URL) {
+    toast.error("URL del backend no configurada");
+    return;
+  }
+
+  try {
+    // Obtener el token de acceso usando la función del auth-client
+    const token = getAccessToken();
+
+    if (!token) {
+      toast.error("No hay sesión activa. Por favor, inicie sesión nuevamente.");
+      return;
+    }
+
+    const response = await fetch(
+      `${JAVA_BACKEND_URL}/liquidations/${liquidationId}/quote-pdf`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+      },
+    );
+
+    if (!response.ok) {
+      if (response.status === 400) {
+        toast.error("La liquidación debe estar en estado 'En cotización' para descargar el PDF");
+        return;
+      }
+      if (response.status === 404) {
+        toast.error("Liquidación no encontrada");
+        return;
+      }
+      throw new Error("Error al descargar el PDF");
+    }
+
+    // Obtener el blob del PDF
+    const blob = await response.blob();
+
+    // Crear URL temporal y descargar
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `cotizacion_${String(liquidationId).padStart(6, "0")}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    toast.success("PDF descargado correctamente");
+  } catch (error) {
+    console.error("Error downloading PDF:", error);
+    toast.error("Error al descargar el PDF de cotización");
+  }
 };

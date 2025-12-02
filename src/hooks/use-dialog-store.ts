@@ -25,6 +25,8 @@ export type DialogType =
   | "add-service"
   | "add-payment"
   | "add-incidency"
+  | "update-status"
+  | "update-payment-status"
   | null;
 
 interface DialogStackItem<T = any> {

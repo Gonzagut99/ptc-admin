@@ -38,6 +38,10 @@ export const addPaymentSchema = z.object({
     (val) => !Number.isNaN(Number(val)) && Number(val) >= 0.01,
     { message: "El monto debe ser mayor a 0." }
   ),
+
+  currency: z.enum(["PEN", "USD"], {
+    message: "Seleccione una moneda.",
+  }),
 });
 
 // Schema para agregar incidencia

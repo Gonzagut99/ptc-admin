@@ -69,3 +69,13 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   YAPE: "Yape",
   OTHER: "Otro",
 };
+
+// Monedas
+export const CURRENCIES = ["PEN", "USD"] as const;
+
+export type Currency = (typeof CURRENCIES)[number];
+
+export const CURRENCY_LABELS: Record<Currency, string> = {
+  PEN: "Soles (PEN)",
+  USD: "Dólares (USD)",
+};

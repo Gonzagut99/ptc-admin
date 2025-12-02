@@ -25,8 +25,8 @@ export default function LiquidationsTable({
   // Select the appropriate hook data based on customerId
   const activeHook = customerId ? customerLiquidationsHook : allLiquidationsHook;
   const { query, data, serverPagination } = activeHook;
-  const searchTerm = "searchTerm" in activeHook ? activeHook.searchTerm : "";
-  const setSearch = "setSearch" in activeHook ? activeHook.setSearch : undefined;
+  const searchTerm = "searchTerm" in activeHook ? (activeHook.searchTerm as string) : "";
+  const setSearch = "setSearch" in activeHook ? (activeHook.setSearch as (value: string) => void) : undefined;
 
   const { isLoading } = query;
   const columns = useMemo(() => liquidationsColumns(), []);

@@ -5,11 +5,14 @@ import Link from "next/link";
 import {
   AlertTriangle,
   CreditCard,
+  Download,
   ExternalLink,
   Eye,
   MoreHorizontal,
   Plus,
+  RefreshCw,
   Trash,
+  Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +26,7 @@ import {
 import { useDialogStore } from "@/hooks/use-dialog-store";
 import { LiquidationWithDetailsDto } from "../../_types/liquidations.types";
 import { MODULE_LIQUIDATIONS } from "../overlays/liquidations-dialogs";
+import { downloadQuotePdf } from "../../_hooks/liquidations-hooks";
 
 interface LiquidationsTableActionsProps {
   row: Row<LiquidationWithDetailsDto>;
@@ -57,6 +61,14 @@ export default function LiquidationsTableActions({
             Gestionar servicios
           </Link>
         </DropdownMenuItem>
+        {liquidation.status === "IN_QUOTE" && (
+          <DropdownMenuItem
+            onClick={() => downloadQuotePdf(liquidation.id as number)}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Descargar cotización
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => open(MODULE_LIQUIDATIONS, "add-service", liquidation)}
@@ -77,6 +89,23 @@ export default function LiquidationsTableActions({
         >
           <AlertTriangle className="mr-2 h-4 w-4" />
           Reportar incidencia
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() =>
+            open(MODULE_LIQUIDATIONS, "update-status", liquidation)
+          }
+        >
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Cambiar estado
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() =>
+            open(MODULE_LIQUIDATIONS, "update-payment-status", liquidation)
+          }
+        >
+          <Wallet className="mr-2 h-4 w-4" />
+          Cambiar estado de pago
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
