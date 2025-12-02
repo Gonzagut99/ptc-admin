@@ -13,10 +13,10 @@ import { Separator } from "@/components/ui/separator";
 import LogInForm from "./LogInForm";
 export const metadata: Metadata = {
   title: "Ingresar",
-  description: "Ingresar al sistema de Work Wear",
+  description: "Ingresar al sistema de PTC Perú Titicaca & Connections",
 };
 
-const CONTACT_EMAIL = "info@workwear.com";
+const CONTACT_EMAIL = "info@ptc.com";
 export default function LogInView() {
   return (
     <div className="relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-[40%_60%] p-0 bg-card">

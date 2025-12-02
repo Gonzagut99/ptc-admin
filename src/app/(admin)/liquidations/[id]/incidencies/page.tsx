@@ -1,17 +1,10 @@
 "use client";
 
 import { use, useState } from "react";
-import { Plus, Pencil, CheckCircle, Trash2, MoreHorizontal } from "lucide-react";
+import { CheckCircle, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,10 +14,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/ui/spinner";
-import { useGetLiquidation } from "../../_hooks/liquidations-hooks";
-import AddIncidencyPageDialog from "../../_components/incidencies/add-incidency-page-dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { formatPeruDate } from "@/utils/peru-datetime";
+import {
+  useDeactivateIncidency,
+  useGetLiquidation,
+} from "../../_hooks/liquidations-hooks";
+import AddIncidencyPageDialog from "../../_components/incidencies/add-incidency-page-dialog";
+import type { components } from "@/lib/api-java/api-java";
 import { toast } from "sonner";
+
+type DIncidency = components["schemas"]["DIncidency"];
 
 interface IncidenciesPageProps {
   params: Promise<{ id: string }>;
@@ -34,8 +41,37 @@ export default function IncidenciesPage({ params }: IncidenciesPageProps) {
   const { id } = use(params);
   const liquidationId = Number(id);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedIncidency, setSelectedIncidency] = useState<DIncidency | null>(null);
 
   const { data: liquidation, isLoading } = useGetLiquidation(liquidationId);
+  const { mutate: deactivateIncidency, isPending: isDeactivating } =
+    useDeactivateIncidency(liquidationId);
+
+  const handleDeleteIncidency = () => {
+    if (!selectedIncidency || !selectedIncidency.id) return;
+    deactivateIncidency(
+      {
+        params: {
+          path: {
+            liquidationId,
+            incidencyId: selectedIncidency.id,
+          },
+        },
+      },
+      {
+        onSuccess: () => {
+          setDeleteDialogOpen(false);
+          setSelectedIncidency(null);
+        },
+      },
+    );
+  };
+
+  const openDeleteDialog = (incidency: DIncidency) => {
+    setSelectedIncidency(incidency);
+    setDeleteDialogOpen(true);
+  };
 
   if (isLoading) {
     return (
@@ -108,7 +144,7 @@ export default function IncidenciesPage({ params }: IncidenciesPageProps) {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => toast.info("Editar incidencia - Próximamente")}>
+                        <DropdownMenuItem disabled>
                           <Pencil className="mr-2 h-4 w-4" />
                           Editar
                         </DropdownMenuItem>
@@ -119,10 +155,10 @@ export default function IncidenciesPage({ params }: IncidenciesPageProps) {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive"
-                          onClick={() => toast.info("Eliminar incidencia - Próximamente")}
+                          onClick={() => openDeleteDialog(incidency)}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Eliminar
+                          Desactivar
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -138,6 +174,17 @@ export default function IncidenciesPage({ params }: IncidenciesPageProps) {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         liquidationId={liquidationId}
+      />
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        handleConfirm={handleDeleteIncidency}
+        isLoading={isDeactivating}
+        title={`Desactivar incidencia #${selectedIncidency?.id}`}
+        desc={`¿Estás seguro de que deseas desactivar esta incidencia: "${selectedIncidency?.reason?.slice(0, 50)}${(selectedIncidency?.reason?.length ?? 0) > 50 ? "..." : ""}"? Esta acción no se puede deshacer.`}
+        confirmText="Desactivar"
+        destructive
+        cancelBtnText="Cancelar"
       />
     </>
   );

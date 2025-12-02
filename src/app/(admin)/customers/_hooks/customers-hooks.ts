@@ -112,3 +112,45 @@ export const useCreateCustomer = () => {
     },
   });
 };
+
+export const useUpdateCustomer = () => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation("put", "/clientes/{id}", {
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get", "/clientes/paginados"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["get", "/clientes"],
+      });
+      toast.success("Cliente actualizado correctamente");
+    },
+    onError: (error) => {
+      toast.error(
+        buildJavaErrorMessage(error, "Ocurrió un error al actualizar el cliente"),
+      );
+    },
+  });
+};
+
+export const useDeactivateCustomer = () => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation("delete", "/clientes/{id}", {
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get", "/clientes/paginados"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["get", "/clientes"],
+      });
+      toast.success("Cliente desactivado correctamente");
+    },
+    onError: (error) => {
+      toast.error(
+        buildJavaErrorMessage(error, "Ocurrió un error al desactivar el cliente"),
+      );
+    },
+  });
+};

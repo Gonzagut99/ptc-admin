@@ -4,6 +4,62 @@
  */
 
 export interface paths {
+    "/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener usuario por ID
+         * @description Obtiene un usuario específico por su ID.
+         */
+        get: operations["getUserById"];
+        /**
+         * Actualizar usuario
+         * @description Actualiza la información de un usuario existente.
+         */
+        put: operations["updateUser"];
+        post?: never;
+        /**
+         * Desactivar usuario
+         * @description Desactiva (soft delete) un usuario existente.
+         */
+        delete: operations["deactivateUser"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Obtener staff por ID
+         * @description Obtiene un miembro del personal específico por su ID.
+         */
+        get: operations["getStaffById"];
+        /**
+         * Actualizar staff
+         * @description Actualiza la información de un miembro del personal existente.
+         */
+        put: operations["updateStaff"];
+        post?: never;
+        /**
+         * Desactivar staff
+         * @description Desactiva (soft delete) un miembro del personal existente.
+         */
+        delete: operations["deactivateStaff"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/notifications/{userNotificationId}/mark-as-read": {
         parameters: {
             query?: never;
@@ -16,6 +72,138 @@ export interface paths {
         put: operations["markAsRead"];
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/liquidations/{liquidationId}/tour-services/{tourServiceId}/tours/{tourId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Actualizar un tour específico */
+        put: operations["updateTour"];
+        post?: never;
+        /** Desactivar (soft delete) un tour */
+        delete: operations["deactivateTour"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/liquidations/{liquidationId}/payments/{paymentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Actualizar un pago */
+        put: operations["updatePayment"];
+        post?: never;
+        /** Desactivar (soft delete) un pago */
+        delete: operations["deactivatePayment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/liquidations/{liquidationId}/incidencies/{incidencyId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Actualizar una incidencia */
+        put: operations["updateIncidency"];
+        post?: never;
+        /** Desactivar (soft delete) una incidencia */
+        delete: operations["deactivateIncidency"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/liquidations/{liquidationId}/hotel-services/{hotelServiceId}/bookings/{hotelBookingId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Actualizar una reserva de hotel específica */
+        put: operations["updateHotelBooking"];
+        post?: never;
+        /** Desactivar (soft delete) una reserva de hotel */
+        delete: operations["deactivateHotelBooking"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/liquidations/{liquidationId}/flight-services/{flightServiceId}/bookings/{flightBookingId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Actualizar una reserva de vuelo específica */
+        put: operations["updateFlightBooking"];
+        post?: never;
+        /** Desactivar (soft delete) una reserva de vuelo */
+        delete: operations["deactivateFlightBooking"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/liquidations/{liquidationId}/additional-services/{additionalServiceId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Actualizar un servicio adicional */
+        put: operations["updateAdditionalService"];
+        post?: never;
+        /** Desactivar (soft delete) un servicio adicional */
+        delete: operations["deactivateAdditionalService"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clientes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Actualizar cliente
+         * @description Actualiza la información de un cliente existente.
+         */
+        put: operations["updateCustomer"];
+        post?: never;
+        /**
+         * Desactivar cliente
+         * @description Desactiva (soft delete) un cliente existente.
+         */
+        delete: operations["deactivateCustomer"];
         options?: never;
         head?: never;
         patch?: never;
@@ -304,20 +492,20 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/users/{id}": {
+    "/auth/change-password": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /**
-         * Obtener usuario por ID
-         * @description Obtiene un usuario específico por su ID.
-         */
-        get: operations["getUserById"];
+        get?: never;
         put?: never;
-        post?: never;
+        /**
+         * Cambiar contraseña
+         * @description Cambia la contraseña del usuario autenticado.
+         */
+        post: operations["changePassword"];
         delete?: never;
         options?: never;
         head?: never;
@@ -336,26 +524,6 @@ export interface paths {
          * @description Obtiene una lista paginada de usuarios según la configuración proporcionada.
          */
         get: operations["getPaginatedUsers"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/staff/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Obtener staff por ID
-         * @description Obtiene un miembro del personal específico por su ID.
-         */
-        get: operations["getStaffById"];
         put?: never;
         post?: never;
         delete?: never;
@@ -449,7 +617,8 @@ export interface paths {
         get: operations["getLiquidationById"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Desactivar (soft delete) una liquidación */
+        delete: operations["deactivateLiquidation"];
         options?: never;
         head?: never;
         patch?: never;
@@ -570,6 +739,61 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        DUser: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
+            userName?: string;
+            email?: string;
+            passwordHash?: string;
+        };
+        ErrorBody: {
+            message?: string;
+            /** @enum {string} */
+            status?: "100 CONTINUE" | "101 SWITCHING_PROTOCOLS" | "102 PROCESSING" | "103 EARLY_HINTS" | "103 CHECKPOINT" | "200 OK" | "201 CREATED" | "202 ACCEPTED" | "203 NON_AUTHORITATIVE_INFORMATION" | "204 NO_CONTENT" | "205 RESET_CONTENT" | "206 PARTIAL_CONTENT" | "207 MULTI_STATUS" | "208 ALREADY_REPORTED" | "226 IM_USED" | "300 MULTIPLE_CHOICES" | "301 MOVED_PERMANENTLY" | "302 FOUND" | "302 MOVED_TEMPORARILY" | "303 SEE_OTHER" | "304 NOT_MODIFIED" | "305 USE_PROXY" | "307 TEMPORARY_REDIRECT" | "308 PERMANENT_REDIRECT" | "400 BAD_REQUEST" | "401 UNAUTHORIZED" | "402 PAYMENT_REQUIRED" | "403 FORBIDDEN" | "404 NOT_FOUND" | "405 METHOD_NOT_ALLOWED" | "406 NOT_ACCEPTABLE" | "407 PROXY_AUTHENTICATION_REQUIRED" | "408 REQUEST_TIMEOUT" | "409 CONFLICT" | "410 GONE" | "411 LENGTH_REQUIRED" | "412 PRECONDITION_FAILED" | "413 PAYLOAD_TOO_LARGE" | "413 REQUEST_ENTITY_TOO_LARGE" | "414 URI_TOO_LONG" | "414 REQUEST_URI_TOO_LONG" | "415 UNSUPPORTED_MEDIA_TYPE" | "416 REQUESTED_RANGE_NOT_SATISFIABLE" | "417 EXPECTATION_FAILED" | "418 I_AM_A_TEAPOT" | "419 INSUFFICIENT_SPACE_ON_RESOURCE" | "420 METHOD_FAILURE" | "421 DESTINATION_LOCKED" | "422 UNPROCESSABLE_ENTITY" | "423 LOCKED" | "424 FAILED_DEPENDENCY" | "425 TOO_EARLY" | "426 UPGRADE_REQUIRED" | "428 PRECONDITION_REQUIRED" | "429 TOO_MANY_REQUESTS" | "431 REQUEST_HEADER_FIELDS_TOO_LARGE" | "451 UNAVAILABLE_FOR_LEGAL_REASONS" | "500 INTERNAL_SERVER_ERROR" | "501 NOT_IMPLEMENTED" | "502 BAD_GATEWAY" | "503 SERVICE_UNAVAILABLE" | "504 GATEWAY_TIMEOUT" | "505 HTTP_VERSION_NOT_SUPPORTED" | "506 VARIANT_ALSO_NEGOTIATES" | "507 INSUFFICIENT_STORAGE" | "508 LOOP_DETECTED" | "509 BANDWIDTH_LIMIT_EXCEEDED" | "510 NOT_EXTENDED" | "511 NETWORK_AUTHENTICATION_REQUIRED";
+            detail?: string;
+            callstack?: string;
+        };
+        UpdateUserDto: {
+            /** Format: email */
+            email?: string;
+            userName?: string;
+            password?: string;
+        };
+        DStaff: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
+            phoneNumber?: string;
+            /** Format: float */
+            salary?: number;
+            /** @enum {string} */
+            currency?: "PEN" | "USD";
+            /** Format: date-time */
+            hireDate?: string;
+            /** @enum {string} */
+            role?: "SALES" | "COUNTER" | "ACCOUNTING" | "OPERATIONS" | "SUPERADMIN" | "SUPPORT";
+            /** Format: int64 */
+            userId?: number;
+            user?: components["schemas"]["DUser"];
+        };
+        UpdateStaffDto: {
+            phoneNumber?: string;
+            /** Format: float */
+            salary?: number;
+            currency?: string;
+            role?: string;
+            /** Format: date-time */
+            hireDate?: string;
+        };
         DNotification: {
             /** Format: int64 */
             id?: number;
@@ -598,39 +822,206 @@ export interface components {
             notificationId?: number;
             notification?: components["schemas"]["DNotification"];
         };
-        DUser: {
+        UpdateTourDto: {
+            /** Format: date-time */
+            start_date: string;
+            /** Format: date-time */
+            end_date: string;
+            title: string;
+            /** Format: float */
+            price: number;
+            place: string;
+            currency: string;
+            status: string;
+        };
+        AdditionalServices: {
             /** Format: int64 */
             id?: number;
             isActive?: boolean;
             /** Format: date-time */
             createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            userName?: string;
-            email?: string;
-            passwordHash?: string;
-        };
-        ErrorBody: {
-            message?: string;
+            /** Format: float */
+            tariffRate?: number;
             /** @enum {string} */
-            status?: "100 CONTINUE" | "101 SWITCHING_PROTOCOLS" | "102 PROCESSING" | "103 EARLY_HINTS" | "103 CHECKPOINT" | "200 OK" | "201 CREATED" | "202 ACCEPTED" | "203 NON_AUTHORITATIVE_INFORMATION" | "204 NO_CONTENT" | "205 RESET_CONTENT" | "206 PARTIAL_CONTENT" | "207 MULTI_STATUS" | "208 ALREADY_REPORTED" | "226 IM_USED" | "300 MULTIPLE_CHOICES" | "301 MOVED_PERMANENTLY" | "302 FOUND" | "302 MOVED_TEMPORARILY" | "303 SEE_OTHER" | "304 NOT_MODIFIED" | "305 USE_PROXY" | "307 TEMPORARY_REDIRECT" | "308 PERMANENT_REDIRECT" | "400 BAD_REQUEST" | "401 UNAUTHORIZED" | "402 PAYMENT_REQUIRED" | "403 FORBIDDEN" | "404 NOT_FOUND" | "405 METHOD_NOT_ALLOWED" | "406 NOT_ACCEPTABLE" | "407 PROXY_AUTHENTICATION_REQUIRED" | "408 REQUEST_TIMEOUT" | "409 CONFLICT" | "410 GONE" | "411 LENGTH_REQUIRED" | "412 PRECONDITION_FAILED" | "413 PAYLOAD_TOO_LARGE" | "413 REQUEST_ENTITY_TOO_LARGE" | "414 URI_TOO_LONG" | "414 REQUEST_URI_TOO_LONG" | "415 UNSUPPORTED_MEDIA_TYPE" | "416 REQUESTED_RANGE_NOT_SATISFIABLE" | "417 EXPECTATION_FAILED" | "418 I_AM_A_TEAPOT" | "419 INSUFFICIENT_SPACE_ON_RESOURCE" | "420 METHOD_FAILURE" | "421 DESTINATION_LOCKED" | "422 UNPROCESSABLE_ENTITY" | "423 LOCKED" | "424 FAILED_DEPENDENCY" | "425 TOO_EARLY" | "426 UPGRADE_REQUIRED" | "428 PRECONDITION_REQUIRED" | "429 TOO_MANY_REQUESTS" | "431 REQUEST_HEADER_FIELDS_TOO_LARGE" | "451 UNAVAILABLE_FOR_LEGAL_REASONS" | "500 INTERNAL_SERVER_ERROR" | "501 NOT_IMPLEMENTED" | "502 BAD_GATEWAY" | "503 SERVICE_UNAVAILABLE" | "504 GATEWAY_TIMEOUT" | "505 HTTP_VERSION_NOT_SUPPORTED" | "506 VARIANT_ALSO_NEGOTIATES" | "507 INSUFFICIENT_STORAGE" | "508 LOOP_DETECTED" | "509 BANDWIDTH_LIMIT_EXCEEDED" | "510 NOT_EXTENDED" | "511 NETWORK_AUTHENTICATION_REQUIRED";
-            detail?: string;
-            callstack?: string;
+            currency?: "PEN" | "USD";
+            /** Format: int64 */
+            liquidationId: number;
+            /** Format: float */
+            price?: number;
+            /** @enum {string} */
+            status?: "PENDING" | "COMPLETED" | "CANCELED";
+            liquidation?: unknown;
+            taxed?: boolean;
         };
-        CreateUserDto: {
-            /** Format: email */
-            email: string;
-            password: string;
-            userName?: string;
+        Customer: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            firstName?: string;
+            lastName?: string;
+            email?: string;
+            phoneNumber?: string;
+            /** Format: date */
+            birthDate?: string;
+            /** @enum {string} */
+            idDocumentType?: "PASSPORT" | "DNI" | "DRIVER_LICENSE" | "RUC" | "CE";
+            idDocumentNumber?: string;
+            address?: string;
+            nationality?: string;
         };
-        DStaff: {
+        FlightBooking: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            origin: string;
+            destiny: string;
+            /** Format: date-time */
+            departureDate: string;
+            /** Format: date-time */
+            arrivalDate: string;
+            aeroline: string;
+            aerolineBookingCode: string;
+            costamarBookingCode?: string;
+            tktNumbers: string;
+            /** @enum {string} */
+            status?: "PENDING" | "COMPLETED" | "CANCELED";
+            /** Format: float */
+            totalPrice?: number;
+            /** @enum {string} */
+            currency?: "PEN" | "USD";
+            /** Format: int64 */
+            flightServiceId?: number;
+            flightService?: components["schemas"]["FlightService"];
+        };
+        FlightService: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** Format: float */
+            tariffRate?: number;
+            /** @enum {string} */
+            currency?: "PEN" | "USD";
+            /** Format: int64 */
+            liquidationId: number;
+            liquidation?: unknown;
+            flightBookings?: components["schemas"]["FlightBooking"][];
+            taxed?: boolean;
+        };
+        HotelBooking: {
             /** Format: int64 */
             id?: number;
             isActive?: boolean;
             /** Format: date-time */
             createdDate?: string;
             /** Format: date-time */
-            updatedDate?: string;
+            checkIn: string;
+            /** Format: date-time */
+            checkOut: string;
+            hotel: string;
+            room: string;
+            roomDescription?: string;
+            /** Format: float */
+            priceByNight?: number;
+            /** @enum {string} */
+            currency?: "PEN" | "USD";
+            /** @enum {string} */
+            status?: "PENDING" | "COMPLETED" | "CANCELED";
+            /** Format: int64 */
+            hotelServiceId?: number;
+            hotelService?: components["schemas"]["HotelService"];
+        };
+        HotelService: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** Format: float */
+            tariffRate?: number;
+            /** @enum {string} */
+            currency?: "PEN" | "USD";
+            /** Format: int64 */
+            liquidationId: number;
+            liquidation?: unknown;
+            hotelBookings?: components["schemas"]["HotelBooking"][];
+            taxed?: boolean;
+        };
+        Incidency: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            reason: string;
+            /** Format: float */
+            amount?: number;
+            /** Format: date-time */
+            incidencyDate: string;
+            /** @enum {string} */
+            incidencyStatus?: "PENDING" | "APPROVED" | "REJECTED";
+            /** Format: int64 */
+            liquidationId: number;
+            liquidation?: unknown;
+        };
+        Liquidation: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** Format: float */
+            currencyRate?: number;
+            /** Format: float */
+            totalAmount?: number;
+            /** Format: date-time */
+            paymentDeadline: string;
+            /** Format: int32 */
+            companion?: number;
+            /** @enum {string} */
+            status?: "IN_QUOTE" | "PENDING" | "ON_COURSE" | "COMPLETED";
+            /** @enum {string} */
+            paymentStatus?: "PENDING" | "ON_COURSE" | "COMPLETED";
+            /** Format: int64 */
+            customerId: number;
+            customer?: components["schemas"]["Customer"];
+            /** Format: int64 */
+            staffId: number;
+            staffOnCharge?: components["schemas"]["Staff"];
+            payments?: components["schemas"]["Payment"][];
+            flightServices?: components["schemas"]["FlightService"][];
+            hotelServices?: components["schemas"]["HotelService"][];
+            tourServices?: components["schemas"]["TourService"][];
+            additionalServices?: components["schemas"]["AdditionalServices"][];
+            incidencies?: components["schemas"]["Incidency"][];
+        };
+        Payment: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** @enum {string} */
+            method?: "DEBIT" | "CREDIT" | "YAPE" | "OTHER";
+            /** Format: float */
+            amount?: number;
+            /** Format: int64 */
+            liquidationId: number;
+            /** @enum {string} */
+            validationStatus?: "PENDING" | "VALID" | "INVALID";
+            liquidation?: unknown;
+        };
+        Staff: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
             phoneNumber?: string;
             /** Format: float */
             salary?: number;
@@ -640,9 +1031,148 @@ export interface components {
             hireDate?: string;
             /** @enum {string} */
             role?: "SALES" | "COUNTER" | "ACCOUNTING" | "OPERATIONS" | "SUPERADMIN" | "SUPPORT";
+            user?: components["schemas"]["User"];
+        };
+        Tour: {
             /** Format: int64 */
-            userId?: number;
-            user?: components["schemas"]["DUser"];
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** Format: date-time */
+            startDate: string;
+            /** Format: date-time */
+            endDate: string;
+            title: string;
+            /** Format: float */
+            price?: number;
+            place: string;
+            /** @enum {string} */
+            currency?: "PEN" | "USD";
+            /** @enum {string} */
+            status?: "PENDING" | "COMPLETED" | "CANCELED";
+            /** Format: int64 */
+            tourServiceId?: number;
+            tourService?: components["schemas"]["TourService"];
+        };
+        TourService: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** Format: float */
+            tariffRate?: number;
+            /** @enum {string} */
+            currency?: "PEN" | "USD";
+            /** Format: int64 */
+            liquidationId: number;
+            liquidation?: components["schemas"]["Liquidation"];
+            tours?: components["schemas"]["Tour"][];
+            taxed?: boolean;
+        };
+        User: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            userName?: string;
+            email?: string;
+            passwordHash?: string;
+            staff?: components["schemas"]["Staff"];
+        };
+        UpdatePaymentDto: {
+            payment_method: string;
+            /** Format: float */
+            amount: number;
+            validation_status: string;
+        };
+        UpdateIncidencyDto: {
+            reason: string;
+            /** Format: float */
+            amount?: number;
+            /** Format: date-time */
+            incidency_date: string;
+            incidency_status: string;
+        };
+        UpdateHotelBookingDto: {
+            /** Format: date-time */
+            check_in: string;
+            /** Format: date-time */
+            check_out: string;
+            hotel: string;
+            room: string;
+            room_description?: string;
+            /** Format: float */
+            price_by_night: number;
+            currency: string;
+            status: string;
+        };
+        UpdateFlightBookingDto: {
+            origin: string;
+            destiny: string;
+            /** Format: date-time */
+            departure_date: string;
+            /** Format: date-time */
+            arrival_date: string;
+            aeroline: string;
+            aeroline_booking_code: string;
+            costamar_booking_code?: string;
+            tkt_numbers: string;
+            status: string;
+            /** Format: float */
+            total_price: number;
+            currency: string;
+        };
+        UpdateAdditionalServiceDto: {
+            /** Format: float */
+            tariff_rate: number;
+            is_taxed: boolean;
+            currency: string;
+            /** Format: float */
+            price: number;
+            status: string;
+        };
+        DCustomer: {
+            /** Format: int64 */
+            id?: number;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdDate?: string;
+            /** Format: date-time */
+            updatedDate?: string;
+            firstName?: string;
+            lastName?: string;
+            email?: string;
+            phoneNumber?: string;
+            /** Format: date */
+            birthDate?: string;
+            /** @enum {string} */
+            idDocumentType?: "PASSPORT" | "DNI" | "DRIVER_LICENSE" | "RUC" | "CE";
+            idDocumentNumber?: string;
+            address?: string;
+            nationality?: string;
+        };
+        UpdateCustomerDto: {
+            firstName?: string;
+            lastName?: string;
+            /** Format: email */
+            email?: string;
+            phoneNumber?: string;
+            /** Format: date */
+            birthDate?: string;
+            /** @enum {string} */
+            idDocumentType?: "PASSPORT" | "DNI" | "DRIVER_LICENSE" | "RUC" | "CE";
+            idDocumentNumber?: string;
+            address?: string;
+            nationality?: string;
+        };
+        CreateUserDto: {
+            /** Format: email */
+            email: string;
+            password: string;
+            userName?: string;
         };
         CreateStaffDto: {
             /** Format: int64 */
@@ -700,26 +1230,6 @@ export interface components {
             status?: "PENDING" | "COMPLETED" | "CANCELED";
             pending?: boolean;
             taxed?: boolean;
-        };
-        DCustomer: {
-            /** Format: int64 */
-            id?: number;
-            isActive?: boolean;
-            /** Format: date-time */
-            createdDate?: string;
-            /** Format: date-time */
-            updatedDate?: string;
-            firstName?: string;
-            lastName?: string;
-            email?: string;
-            phoneNumber?: string;
-            /** Format: date */
-            birthDate?: string;
-            /** @enum {string} */
-            idDocumentType?: "PASSPORT" | "DNI" | "DRIVER_LICENSE" | "RUC" | "CE";
-            idDocumentNumber?: string;
-            address?: string;
-            nationality?: string;
         };
         DFlightBooking: {
             /** Format: int64 */
@@ -864,11 +1374,11 @@ export interface components {
             staffId?: number;
             staffOnCharge?: components["schemas"]["DStaff"];
             incidencies?: components["schemas"]["DIncidency"][];
-            /** Format: float */
-            totalPaid?: number;
+            overdue?: boolean;
             /** Format: float */
             remainingAmount?: number;
-            overdue?: boolean;
+            /** Format: float */
+            totalPaid?: number;
         };
         DPayment: {
             /** Format: int64 */
@@ -1060,6 +1570,37 @@ export interface components {
             email: string;
             password: string;
         };
+        /** @description Respuesta de cambio de contraseña */
+        ChangePasswordResponseDto: {
+            /**
+             * @description Indica si el cambio fue exitoso
+             * @example true
+             */
+            success?: boolean;
+            /**
+             * @description Mensaje descriptivo del resultado
+             * @example Contraseña actualizada exitosamente
+             */
+            message?: string;
+        };
+        /** @description Solicitud de cambio de contraseña */
+        ChangePasswordRequestDto: {
+            /**
+             * @description Contraseña actual del usuario
+             * @example currentPassword123
+             */
+            currentPassword: string;
+            /**
+             * @description Nueva contraseña (mínimo 8 caracteres)
+             * @example newSecurePassword456
+             */
+            newPassword: string;
+            /**
+             * @description Confirmación de la nueva contraseña
+             * @example newSecurePassword456
+             */
+            confirmPassword: string;
+        };
         PaginatedUserRequestDto: {
             /** Format: int32 */
             page?: number;
@@ -1177,6 +1718,218 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getUserById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Usuario encontrado exitosamente */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DUser"];
+                };
+            };
+            /** @description Usuario no encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    updateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUserDto"];
+            };
+        };
+        responses: {
+            /** @description Usuario actualizado exitosamente */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DUser"];
+                };
+            };
+            /** @description Solicitud inválida */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Usuario no encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    deactivateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Usuario desactivado exitosamente */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DUser"];
+                };
+            };
+            /** @description Usuario no encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    getStaffById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Staff encontrado exitosamente */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DStaff"];
+                };
+            };
+            /** @description Staff no encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    updateStaff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateStaffDto"];
+            };
+        };
+        responses: {
+            /** @description Staff actualizado exitosamente */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DStaff"];
+                };
+            };
+            /** @description Solicitud inválida */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Staff no encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    deactivateStaff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Staff desactivado exitosamente */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DStaff"];
+                };
+            };
+            /** @description Staff no encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
     markAsRead: {
         parameters: {
             query?: never;
@@ -1195,6 +1948,387 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["DUserNotification"];
+                };
+            };
+        };
+    };
+    updateTour: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+                tourServiceId: number;
+                tourId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTourDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Tour"];
+                };
+            };
+        };
+    };
+    deactivateTour: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+                tourServiceId: number;
+                tourId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Tour"];
+                };
+            };
+        };
+    };
+    updatePayment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+                paymentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePaymentDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Payment"];
+                };
+            };
+        };
+    };
+    deactivatePayment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+                paymentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Payment"];
+                };
+            };
+        };
+    };
+    updateIncidency: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+                incidencyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateIncidencyDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Incidency"];
+                };
+            };
+        };
+    };
+    deactivateIncidency: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+                incidencyId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Incidency"];
+                };
+            };
+        };
+    };
+    updateHotelBooking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+                hotelServiceId: number;
+                hotelBookingId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateHotelBookingDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HotelBooking"];
+                };
+            };
+        };
+    };
+    deactivateHotelBooking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+                hotelServiceId: number;
+                hotelBookingId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HotelBooking"];
+                };
+            };
+        };
+    };
+    updateFlightBooking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+                flightServiceId: number;
+                flightBookingId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateFlightBookingDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FlightBooking"];
+                };
+            };
+        };
+    };
+    deactivateFlightBooking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+                flightServiceId: number;
+                flightBookingId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FlightBooking"];
+                };
+            };
+        };
+    };
+    updateAdditionalService: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+                additionalServiceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAdditionalServiceDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdditionalServices"];
+                };
+            };
+        };
+    };
+    deactivateAdditionalService: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+                additionalServiceId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdditionalServices"];
+                };
+            };
+        };
+    };
+    updateCustomer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCustomerDto"];
+            };
+        };
+        responses: {
+            /** @description Cliente actualizado exitosamente */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DCustomer"];
+                };
+            };
+            /** @description Solicitud inválida */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Cliente no encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    deactivateCustomer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cliente desactivado exitosamente */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DCustomer"];
+                };
+            };
+            /** @description Cliente no encontrado */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
                 };
             };
         };
@@ -1576,8 +2710,8 @@ export interface operations {
     logout: {
         parameters: {
             query?: never;
-            header: {
-                Authorization: string;
+            header?: {
+                Authorization?: string;
             };
             path?: never;
             cookie?: never;
@@ -1675,28 +2809,39 @@ export interface operations {
             };
         };
     };
-    getUserById: {
+    changePassword: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                id: number;
-            };
+            path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangePasswordRequestDto"];
+            };
+        };
         responses: {
-            /** @description Usuario encontrado exitosamente */
+            /** @description Contraseña cambiada exitosamente */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["DUser"];
+                    "application/json": components["schemas"]["ChangePasswordResponseDto"];
                 };
             };
-            /** @description Usuario no encontrado */
-            404: {
+            /** @description Datos de solicitud inválidos o contraseña no coincide */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Contraseña actual incorrecta o no autorizado */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1728,37 +2873,6 @@ export interface operations {
             };
             /** @description Solicitud inválida */
             400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorBody"];
-                };
-            };
-        };
-    };
-    getStaffById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Staff encontrado exitosamente */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["DStaff"];
-                };
-            };
-            /** @description Staff no encontrado */
-            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1894,6 +3008,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["LiquidationWithDetailsDto"];
+                };
+            };
+        };
+    };
+    deactivateLiquidation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                liquidationId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Liquidation"];
                 };
             };
         };

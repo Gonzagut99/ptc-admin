@@ -1,17 +1,22 @@
 "use client";
 
+import { Trash } from "lucide-react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useDialogStore } from "@/hooks/use-dialog-store";
+import { useDeactivateLiquidation } from "../../_hooks/liquidations-hooks";
 import { LiquidationWithDetailsDto } from "../../_types/liquidations.types";
 import LiquidationCreateDialog from "../create/liquidation-create-dialog";
 import LiquidationDetailDialog from "../detail/liquidation-detail-dialog";
-import AddServiceDialog from "../services/add-service-dialog";
-import AddPaymentDialog from "../payments/add-payment-dialog";
 import AddIncidencyDialog from "../incidencies/add-incidency-dialog";
+import AddPaymentDialog from "../payments/add-payment-dialog";
+import AddServiceDialog from "../services/add-service-dialog";
 
 export const MODULE_LIQUIDATIONS = "java-liquidations";
 
 export default function LiquidationsDialogs() {
   const { isOpenForModule, close, data, type, module } = useDialogStore();
+  const { mutate: deactivateLiquidation, isPending: isDeactivating } =
+    useDeactivateLiquidation();
 
   // Solo renderizar si estamos en el módulo correcto
   if (module !== MODULE_LIQUIDATIONS) {
@@ -19,6 +24,14 @@ export default function LiquidationsDialogs() {
   }
 
   const liquidation = data as LiquidationWithDetailsDto;
+
+  const handleDeactivate = () => {
+    if (!liquidation?.id) return;
+    deactivateLiquidation(
+      { params: { path: { liquidationId: liquidation.id } } },
+      { onSuccess: () => close() },
+    );
+  };
 
   return (
     <>
@@ -54,6 +67,36 @@ export default function LiquidationsDialogs() {
           open={isOpenForModule(MODULE_LIQUIDATIONS, "add-incidency")}
           onOpenChange={close}
           liquidation={liquidation}
+        />
+      )}
+      {type === "delete" && (
+        <ConfirmDialog
+          key="liquidation-delete"
+          open={isOpenForModule(MODULE_LIQUIDATIONS, "delete")}
+          onOpenChange={(open) => {
+            if (!open) close();
+          }}
+          handleConfirm={handleDeactivate}
+          isLoading={isDeactivating}
+          className="max-w-md"
+          title={
+            <div className="items-center gap-2 inline-flex flex-wrap">
+              <Trash className="h-4 w-4 text-rose-500" />
+              Desactivar liquidación{" "}
+              <strong className="uppercase">#{liquidation?.id}</strong>
+            </div>
+          }
+          desc={
+            <>
+              Estás a punto de desactivar la liquidación{" "}
+              <strong>#{liquidation?.id}</strong>
+              . <br />
+              La liquidación será desactivada y no aparecerá en las listas.
+            </>
+          }
+          confirmText="Desactivar"
+          destructive
+          cancelBtnText="Cancelar"
         />
       )}
     </>

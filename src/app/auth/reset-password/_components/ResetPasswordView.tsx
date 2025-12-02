@@ -64,7 +64,7 @@ export default function ResetPasswordView() {
           </div>
           <div className="text-start text-sm font-normal px-6 pb-5">
             <p className="text-[16px] text-[#62748E]">
-              © {new Date().getFullYear()} Work Wear Industrial E.I.R.L. Todos
+              © {new Date().getFullYear()} PTC Perú Titicaca & Connections. Todos
               los derechos reservados.
             </p>
           </div>
@@ -116,7 +116,7 @@ export default function ResetPasswordView() {
         </div>
         <div className="text-start text-sm font-normal px-6 pb-5">
           <p className="text-[16px] text-[#62748E]">
-            © {new Date().getFullYear()} Work Wear Industrial E.I.R.L. Todos los
+            © {new Date().getFullYear()} PTC Perú Titicaca & Connections. Todos los
             derechos reservados.
           </p>
         </div>

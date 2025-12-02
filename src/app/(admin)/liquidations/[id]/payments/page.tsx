@@ -1,17 +1,11 @@
 "use client";
 
 import { use, useState } from "react";
-import { Plus, Pencil, Trash2, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,13 +14,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
-import { useGetLiquidation } from "../../_hooks/liquidations-hooks";
-import AddPaymentPageDialog from "../../_components/payments/add-payment-page-dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { formatPeruDate } from "@/utils/peru-datetime";
+import {
+  useDeactivatePayment,
+  useGetLiquidation,
+} from "../../_hooks/liquidations-hooks";
+import AddPaymentPageDialog from "../../_components/payments/add-payment-page-dialog";
 import { PAYMENT_METHOD_LABELS, PaymentMethod } from "../../_types/liquidations.types";
-import { toast } from "sonner";
+import type { components } from "@/lib/api-java/api-java";
+
+type DPayment = components["schemas"]["DPayment"];
 
 interface PaymentsPageProps {
   params: Promise<{ id: string }>;
@@ -36,8 +42,37 @@ export default function PaymentsPage({ params }: PaymentsPageProps) {
   const { id } = use(params);
   const liquidationId = Number(id);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<DPayment | null>(null);
 
   const { data: liquidation, isLoading } = useGetLiquidation(liquidationId);
+  const { mutate: deactivatePayment, isPending: isDeactivating } =
+    useDeactivatePayment(liquidationId);
+
+  const handleDeletePayment = () => {
+    if (!selectedPayment || !selectedPayment.id) return;
+    deactivatePayment(
+      {
+        params: {
+          path: {
+            liquidationId,
+            paymentId: selectedPayment.id,
+          },
+        },
+      },
+      {
+        onSuccess: () => {
+          setDeleteDialogOpen(false);
+          setSelectedPayment(null);
+        },
+      },
+    );
+  };
+
+  const openDeleteDialog = (payment: DPayment) => {
+    setSelectedPayment(payment);
+    setDeleteDialogOpen(true);
+  };
 
   if (isLoading) {
     return (
@@ -108,17 +143,17 @@ export default function PaymentsPage({ params }: PaymentsPageProps) {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => toast.info("Editar pago - Próximamente")}>
+                        <DropdownMenuItem disabled>
                           <Pencil className="mr-2 h-4 w-4" />
                           Editar
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-destructive"
-                          onClick={() => toast.info("Eliminar pago - Próximamente")}
+                          onClick={() => openDeleteDialog(payment)}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Eliminar
+                          Desactivar
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -134,6 +169,17 @@ export default function PaymentsPage({ params }: PaymentsPageProps) {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         liquidationId={liquidationId}
+      />
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        handleConfirm={handleDeletePayment}
+        isLoading={isDeactivating}
+        title={`Desactivar pago #${selectedPayment?.id}`}
+        desc={`¿Estás seguro de que deseas desactivar este pago de ${formatCurrency(selectedPayment?.amount)}? Esta acción no se puede deshacer.`}
+        confirmText="Desactivar"
+        destructive
+        cancelBtnText="Cancelar"
       />
     </>
   );

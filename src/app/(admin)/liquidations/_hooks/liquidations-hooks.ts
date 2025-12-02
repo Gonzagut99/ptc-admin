@@ -329,3 +329,308 @@ export const useAddIncidency = (liquidationId: number) => {
     },
   );
 };
+
+// ==================== DEACTIVATE HOOKS ====================
+
+export const useDeactivateLiquidation = () => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "delete",
+    "/liquidations/{liquidationId}",
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["get", "/liquidations/paginated"],
+        });
+        toast.success("Liquidación desactivada correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al desactivar la liquidación",
+          ),
+        );
+      },
+    },
+  );
+};
+
+export const useDeactivateTour = (liquidationId: number) => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "delete",
+    "/liquidations/{liquidationId}/tour-services/{tourServiceId}/tours/{tourId}",
+    {
+      onSuccess: () => {
+        invalidateLiquidationQueries(queryClient, liquidationId);
+        toast.success("Tour desactivado correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al desactivar el tour",
+          ),
+        );
+      },
+    },
+  );
+};
+
+export const useDeactivateHotelBooking = (liquidationId: number) => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "delete",
+    "/liquidations/{liquidationId}/hotel-services/{hotelServiceId}/bookings/{hotelBookingId}",
+    {
+      onSuccess: () => {
+        invalidateLiquidationQueries(queryClient, liquidationId);
+        toast.success("Reserva de hotel desactivada correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al desactivar la reserva de hotel",
+          ),
+        );
+      },
+    },
+  );
+};
+
+export const useDeactivateFlightBooking = (liquidationId: number) => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "delete",
+    "/liquidations/{liquidationId}/flight-services/{flightServiceId}/bookings/{flightBookingId}",
+    {
+      onSuccess: () => {
+        invalidateLiquidationQueries(queryClient, liquidationId);
+        toast.success("Reserva de vuelo desactivada correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al desactivar la reserva de vuelo",
+          ),
+        );
+      },
+    },
+  );
+};
+
+export const useDeactivateAdditionalService = (liquidationId: number) => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "delete",
+    "/liquidations/{liquidationId}/additional-services/{additionalServiceId}",
+    {
+      onSuccess: () => {
+        invalidateLiquidationQueries(queryClient, liquidationId);
+        toast.success("Servicio adicional desactivado correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al desactivar el servicio adicional",
+          ),
+        );
+      },
+    },
+  );
+};
+
+export const useDeactivatePayment = (liquidationId: number) => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "delete",
+    "/liquidations/{liquidationId}/payments/{paymentId}",
+    {
+      onSuccess: () => {
+        invalidateLiquidationQueries(queryClient, liquidationId);
+        toast.success("Pago desactivado correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al desactivar el pago",
+          ),
+        );
+      },
+    },
+  );
+};
+
+export const useDeactivateIncidency = (liquidationId: number) => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "delete",
+    "/liquidations/{liquidationId}/incidencies/{incidencyId}",
+    {
+      onSuccess: () => {
+        invalidateLiquidationQueries(queryClient, liquidationId);
+        toast.success("Incidencia desactivada correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al desactivar la incidencia",
+          ),
+        );
+      },
+    },
+  );
+};
+
+// ==================== UPDATE HOOKS ====================
+
+export const useUpdateTour = (liquidationId: number) => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "put",
+    "/liquidations/{liquidationId}/tour-services/{tourServiceId}/tours/{tourId}",
+    {
+      onSuccess: () => {
+        invalidateLiquidationQueries(queryClient, liquidationId);
+        toast.success("Tour actualizado correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al actualizar el tour",
+          ),
+        );
+      },
+    },
+  );
+};
+
+export const useUpdateHotelBooking = (liquidationId: number) => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "put",
+    "/liquidations/{liquidationId}/hotel-services/{hotelServiceId}/bookings/{hotelBookingId}",
+    {
+      onSuccess: () => {
+        invalidateLiquidationQueries(queryClient, liquidationId);
+        toast.success("Reserva de hotel actualizada correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al actualizar la reserva de hotel",
+          ),
+        );
+      },
+    },
+  );
+};
+
+export const useUpdateFlightBooking = (liquidationId: number) => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "put",
+    "/liquidations/{liquidationId}/flight-services/{flightServiceId}/bookings/{flightBookingId}",
+    {
+      onSuccess: () => {
+        invalidateLiquidationQueries(queryClient, liquidationId);
+        toast.success("Reserva de vuelo actualizada correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al actualizar la reserva de vuelo",
+          ),
+        );
+      },
+    },
+  );
+};
+
+export const useUpdateAdditionalService = (liquidationId: number) => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "put",
+    "/liquidations/{liquidationId}/additional-services/{additionalServiceId}",
+    {
+      onSuccess: () => {
+        invalidateLiquidationQueries(queryClient, liquidationId);
+        toast.success("Servicio adicional actualizado correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al actualizar el servicio adicional",
+          ),
+        );
+      },
+    },
+  );
+};
+
+export const useUpdatePayment = (liquidationId: number) => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "put",
+    "/liquidations/{liquidationId}/payments/{paymentId}",
+    {
+      onSuccess: () => {
+        invalidateLiquidationQueries(queryClient, liquidationId);
+        toast.success("Pago actualizado correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al actualizar el pago",
+          ),
+        );
+      },
+    },
+  );
+};
+
+export const useUpdateIncidency = (liquidationId: number) => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation(
+    "put",
+    "/liquidations/{liquidationId}/incidencies/{incidencyId}",
+    {
+      onSuccess: () => {
+        invalidateLiquidationQueries(queryClient, liquidationId);
+        toast.success("Incidencia actualizada correctamente");
+      },
+      onError: (error) => {
+        toast.error(
+          buildJavaErrorMessage(
+            error,
+            "Ocurrió un error al actualizar la incidencia",
+          ),
+        );
+      },
+    },
+  );
+};

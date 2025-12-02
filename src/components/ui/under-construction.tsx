@@ -10,7 +10,7 @@ export default function UnderConstruction() {
     <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4">
       <div className="max-w-2xl mx-auto text-center">
         <div className="mb-8 flex justify-center">
-          <LogoSmall className="w-24 h-16 hover:animate-bounce" />
+          <LogoSmall className="size-24 hover:animate-bounce" />
         </div>
 
         <h1 className="text-2xl md:text-3xl font-bold mb-4">
@@ -55,7 +55,7 @@ export default function UnderConstruction() {
 
         <div className="mt-12 text-sm">
           <p>
-            © {new Date().getFullYear()} Work Wear Industrial E.I.R.L. Todos los
+            © {new Date().getFullYear()} PTC Perú Titicaca & Connections. Todos los
             derechos reservados.
           </p>
         </div>

@@ -2,7 +2,15 @@
 
 import { Row } from "@tanstack/react-table";
 import Link from "next/link";
-import { Eye, MoreHorizontal, Plus, CreditCard, AlertTriangle, ExternalLink } from "lucide-react";
+import {
+  AlertTriangle,
+  CreditCard,
+  ExternalLink,
+  Eye,
+  MoreHorizontal,
+  Plus,
+  Trash,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -63,10 +71,20 @@ export default function LiquidationsTableActions({
           Registrar pago
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => open(MODULE_LIQUIDATIONS, "add-incidency", liquidation)}
+          onClick={() =>
+            open(MODULE_LIQUIDATIONS, "add-incidency", liquidation)
+          }
         >
           <AlertTriangle className="mr-2 h-4 w-4" />
           Reportar incidencia
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => open(MODULE_LIQUIDATIONS, "delete", liquidation)}
+          className="text-destructive focus:text-destructive"
+        >
+          <Trash className="mr-2 h-4 w-4" />
+          Desactivar
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

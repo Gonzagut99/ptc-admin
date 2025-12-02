@@ -96,3 +96,39 @@ export const useCreateUser = () => {
     },
   });
 };
+
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation("put", "/users/{id}", {
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get", "/users/paginados"],
+      });
+      toast.success("Usuario actualizado correctamente");
+    },
+    onError: (error) => {
+      toast.error(
+        buildJavaErrorMessage(error, "Ocurrió un error al actualizar el usuario"),
+      );
+    },
+  });
+};
+
+export const useDeactivateUser = () => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation("delete", "/users/{id}", {
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get", "/users/paginados"],
+      });
+      toast.success("Usuario desactivado correctamente");
+    },
+    onError: (error) => {
+      toast.error(
+        buildJavaErrorMessage(error, "Ocurrió un error al desactivar el usuario"),
+      );
+    },
+  });
+};

@@ -8,8 +8,8 @@ import { AuthProvider } from "../contexts/auth-provider";
 import { QueryProvider } from "../contexts/query-provider";
 
 export const metadata: Metadata = {
-  title: "Work Wear Industrial",
-  description: "Sistema de gestión de Work Wear Industrial",
+  title: "PTC Perú Titicaca & Connections",
+  description: "Sistema de gestión de PTC Perú Titicaca & Connections",
 };
 
 const META_THEME_COLORS = {

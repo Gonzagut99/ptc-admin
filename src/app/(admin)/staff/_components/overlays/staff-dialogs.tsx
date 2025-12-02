@@ -3,14 +3,18 @@
 import { Trash } from "lucide-react";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useDialogStore } from "@/hooks/use-dialog-store";
+import { useDeactivateStaff } from "../../_hooks/staff-hooks";
 import { DStaff } from "../../_types/staff.types";
 import StaffCreateDialog from "../create/staff-create-dialog";
 import StaffDetailDialog from "../detail/staff-detail-dialog";
+import StaffEditDialog from "../edit/staff-edit-dialog";
 
 export const MODULE_STAFF = "java-staff";
 
 export default function StaffDialogs() {
   const { isOpenForModule, close, data, type, module } = useDialogStore();
+  const { mutate: deactivateStaff, isPending: isDeactivating } =
+    useDeactivateStaff();
 
   // Solo renderizar si estamos en el módulo correcto
   if (module !== MODULE_STAFF) {
@@ -19,12 +23,27 @@ export default function StaffDialogs() {
 
   const staff = data as DStaff;
 
+  const handleDeactivate = () => {
+    if (!staff?.id) return;
+    deactivateStaff(
+      { params: { path: { id: staff.id } } },
+      { onSuccess: () => close() },
+    );
+  };
+
   return (
     <>
       {type === "create" && (
         <StaffCreateDialog
           open={isOpenForModule(MODULE_STAFF, "create")}
           onOpenChange={close}
+        />
+      )}
+      {type === "edit" && (
+        <StaffEditDialog
+          open={isOpenForModule(MODULE_STAFF, "edit")}
+          onOpenChange={close}
+          staff={staff}
         />
       )}
       {type === "details" && (
@@ -41,15 +60,13 @@ export default function StaffDialogs() {
           onOpenChange={(open) => {
             if (!open) close();
           }}
-          handleConfirm={() => {
-            // TODO: Implementar eliminación cuando el backend lo soporte
-            close();
-          }}
+          handleConfirm={handleDeactivate}
+          isLoading={isDeactivating}
           className="max-w-md"
           title={
             <div className="items-center gap-2 inline-flex flex-wrap">
               <Trash className="h-4 w-4 text-rose-500" />
-              Eliminar personal{" "}
+              Desactivar personal{" "}
               <strong className="uppercase">
                 {staff?.user?.userName || staff?.user?.email}
               </strong>
@@ -57,13 +74,13 @@ export default function StaffDialogs() {
           }
           desc={
             <>
-              Estás a punto de eliminar el personal{" "}
+              Estás a punto de desactivar el personal{" "}
               <strong>{staff?.user?.userName || staff?.user?.email}</strong>
               . <br />
-              Esta acción no se puede deshacer.
+              El personal será desactivado y no aparecerá en las listas.
             </>
           }
-          confirmText="Eliminar"
+          confirmText="Desactivar"
           destructive
           cancelBtnText="Cancelar"
         />

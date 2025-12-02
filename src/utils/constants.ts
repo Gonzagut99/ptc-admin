@@ -15,5 +15,4 @@ export const USER_KEY = "ptc_user";
  * @deprecated Use AUTH_FLAG_COOKIE_NAME instead
  * Legacy: mantenido por compatibilidad con BetterAuth
  */
-export const BETTER_AUTH_COOKIE_PREFIX = "work-wear-better-auth";
 export const AUTH_COOKIE_NAME = AUTH_FLAG_COOKIE_NAME;

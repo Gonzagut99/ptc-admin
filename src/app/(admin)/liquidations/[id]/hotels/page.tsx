@@ -1,17 +1,11 @@
 "use client";
 
 import { use, useState } from "react";
-import { Plus, Pencil, XCircle, Trash2, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,12 +14,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
-import { useGetLiquidation } from "../../_hooks/liquidations-hooks";
-import { AddHotelDialog } from "../../_components/services/add-hotel-dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { formatPeruDate } from "@/utils/peru-datetime";
-import { toast } from "sonner";
+import {
+  useDeactivateHotelBooking,
+  useGetLiquidation,
+} from "../../_hooks/liquidations-hooks";
+import { AddHotelDialog } from "../../_components/services/add-hotel-dialog";
+import type { components } from "@/lib/api-java/api-java";
+
+type DHotelBooking = components["schemas"]["DHotelBooking"];
+type DHotelService = components["schemas"]["DHotelService"];
 
 interface HotelsPageProps {
   params: Promise<{ id: string }>;
@@ -35,8 +42,41 @@ export default function HotelsPage({ params }: HotelsPageProps) {
   const { id } = use(params);
   const liquidationId = Number(id);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<{
+    booking: DHotelBooking;
+    hotelServiceId: number;
+  } | null>(null);
 
   const { data: liquidation, isLoading } = useGetLiquidation(liquidationId);
+  const { mutate: deactivateBooking, isPending: isDeactivating } =
+    useDeactivateHotelBooking(liquidationId);
+
+  const handleDeleteBooking = () => {
+    if (!selectedBooking || !selectedBooking.booking.id) return;
+    deactivateBooking(
+      {
+        params: {
+          path: {
+            liquidationId,
+            hotelServiceId: selectedBooking.hotelServiceId,
+            hotelBookingId: selectedBooking.booking.id,
+          },
+        },
+      },
+      {
+        onSuccess: () => {
+          setDeleteDialogOpen(false);
+          setSelectedBooking(null);
+        },
+      },
+    );
+  };
+
+  const openDeleteDialog = (booking: DHotelBooking, hotelServiceId: number) => {
+    setSelectedBooking({ booking, hotelServiceId });
+    setDeleteDialogOpen(true);
+  };
 
   if (isLoading) {
     return (
@@ -58,83 +98,123 @@ export default function HotelsPage({ params }: HotelsPageProps) {
             Agregar Hotel
           </Button>
         </CardHeader>
-      <CardContent>
-        {hotelServices.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            No hay servicios de hotel registrados
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Tarifa</TableHead>
-                <TableHead>Moneda</TableHead>
-                <TableHead>IGV</TableHead>
-                <TableHead>Reservas</TableHead>
-                <TableHead>Creado</TableHead>
-                <TableHead className="w-[70px]">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {hotelServices.map((service) => (
-                <TableRow key={service.id}>
-                  <TableCell className="font-mono">#{service.id}</TableCell>
-                  <TableCell className="font-mono">{service.tariffRate?.toFixed(2)}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{service.currency}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={service.taxed ? "default" : "secondary"}>
-                      {service.taxed ? "Sí" : "No"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {service.hotelBookings?.length ?? 0} reserva(s)
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {service.createdDate ? formatPeruDate(service.createdDate) : "-"}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => toast.info("Editar servicio - Próximamente")}>
-                          <Pencil className="mr-2 h-4 w-4" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toast.info("Cancelar servicio - Próximamente")}>
-                          <XCircle className="mr-2 h-4 w-4" />
-                          Cancelar
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={() => toast.info("Eliminar servicio - Próximamente")}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Eliminar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
+        <CardContent>
+          {hotelServices.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No hay servicios de hotel registrados
+            </div>
+          ) : (
+            hotelServices.map((service: DHotelService) => (
+              <div key={service.id} className="mb-6 last:mb-0">
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="outline">Servicio #{service.id}</Badge>
+                  <span className="text-sm text-muted-foreground">
+                    Tarifa: {service.tariffRate?.toFixed(2)} {service.currency}
+                  </span>
+                  <Badge variant={service.taxed ? "default" : "secondary"}>
+                    {service.taxed ? "Con IGV" : "Sin IGV"}
+                  </Badge>
+                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Hotel</TableHead>
+                      <TableHead>Habitación</TableHead>
+                      <TableHead>Check-in</TableHead>
+                      <TableHead>Check-out</TableHead>
+                      <TableHead>Precio/Noche</TableHead>
+                      <TableHead>Estado</TableHead>
+                      <TableHead className="w-[70px]">Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {service.hotelBookings?.map((booking: DHotelBooking) => (
+                      <TableRow key={booking.id}>
+                        <TableCell className="font-mono">#{booking.id}</TableCell>
+                        <TableCell>{booking.hotel}</TableCell>
+                        <TableCell>{booking.room}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {booking.checkIn
+                            ? formatPeruDate(booking.checkIn)
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {booking.checkOut
+                            ? formatPeruDate(booking.checkOut)
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="font-mono">
+                          {booking.priceByNight?.toFixed(2)} {booking.currency}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              booking.status === "COMPLETED"
+                                ? "default"
+                                : booking.status === "CANCELED"
+                                  ? "destructive"
+                                  : "secondary"
+                            }
+                          >
+                            {booking.status === "COMPLETED"
+                              ? "Completado"
+                              : booking.status === "CANCELED"
+                                ? "Cancelado"
+                                : "Pendiente"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem disabled>
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={() =>
+                                  service.id && openDeleteDialog(booking, service.id)
+                                }
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Desactivar
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ))
+          )}
+        </CardContent>
       </Card>
       <AddHotelDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         liquidationId={liquidationId}
+      />
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        handleConfirm={handleDeleteBooking}
+        isLoading={isDeactivating}
+        title={`Desactivar reserva en "${selectedBooking?.booking.hotel}"`}
+        desc="¿Estás seguro de que deseas desactivar esta reserva de hotel? Esta acción no se puede deshacer."
+        confirmText="Desactivar"
+        destructive
+        cancelBtnText="Cancelar"
       />
     </>
   );

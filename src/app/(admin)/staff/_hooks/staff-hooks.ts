@@ -151,3 +151,39 @@ export const useCreateUserWithStaff = () => {
     },
   });
 };
+
+export const useUpdateStaff = () => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation("put", "/staff/{id}", {
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get", "/staff/paginados"],
+      });
+      toast.success("Personal actualizado correctamente");
+    },
+    onError: (error) => {
+      toast.error(
+        buildJavaErrorMessage(error, "Ocurrió un error al actualizar el personal"),
+      );
+    },
+  });
+};
+
+export const useDeactivateStaff = () => {
+  const queryClient = useQueryClient();
+
+  return backendJava.useMutation("delete", "/staff/{id}", {
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get", "/staff/paginados"],
+      });
+      toast.success("Personal desactivado correctamente");
+    },
+    onError: (error) => {
+      toast.error(
+        buildJavaErrorMessage(error, "Ocurrió un error al desactivar el personal"),
+      );
+    },
+  });
+};

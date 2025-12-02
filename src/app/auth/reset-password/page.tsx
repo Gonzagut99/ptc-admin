@@ -4,7 +4,7 @@ import ResetPasswordView from "./_components/ResetPasswordView";
 
 export const metadata: Metadata = {
   title: "Restablecer contraseña",
-  description: "Restablece tu contraseña de Work Wear",
+  description: "Restablece tu contraseña de PTC Perú Titicaca & Connections",
 };
 
 export default function ResetPasswordPage() {

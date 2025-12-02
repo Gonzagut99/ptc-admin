@@ -7,7 +7,7 @@ export type ResourceType = components["schemas"]["ResourceType"];
 export type ActionType = components["schemas"]["ActionType"];
 
 // =============================================================================
-// RECURSOS (Resources) - Work Wear
+// RECURSOS (Resources) - PTC Perú Titicaca & Connections
 // =============================================================================
 // Mapeo de recursos basado en ResourceType del backend
 export const ResourceTypeMap: Record<ResourceType, string> = {
@@ -66,7 +66,7 @@ export const ResourceTypeMap: Record<ResourceType, string> = {
 } as const;
 
 // =============================================================================
-// ACCIONES (Actions) - Work Wear
+// ACCIONES (Actions) - PTC Perú Titicaca & Connections
 // =============================================================================
 // Mapeo de acciones basado en ActionType del backend
 export const ActionTypeMap: Record<ActionType, string> = {
