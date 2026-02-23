@@ -253,6 +253,69 @@ export const getUserSessions = async (): Promise<SessionInfoDto[]> => {
 };
 
 /**
+ * Decode JWT token to check expiration
+ * Returns null if token is invalid
+ */
+const decodeJwtPayload = (token: string): { exp?: number } | null => {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const payload = JSON.parse(atob(parts[1]));
+    return payload;
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Check if access token is expired or about to expire
+ * @param bufferSeconds - Seconds before actual expiration to consider as expired (default: 60)
+ */
+export const isAccessTokenExpired = (bufferSeconds: number = 60): boolean => {
+  const token = getAccessToken();
+  if (!token) return true;
+
+  const payload = decodeJwtPayload(token);
+  if (!payload?.exp) return true;
+
+  const now = Math.floor(Date.now() / 1000);
+  return payload.exp <= now + bufferSeconds;
+};
+
+/**
+ * Validate and refresh session if needed
+ * This should be called on app initialization to proactively refresh tokens
+ * @returns true if session is valid or was successfully refreshed
+ */
+export const validateAndRefreshSession = async (): Promise<boolean> => {
+  // Check if we have a refresh token
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) {
+    console.log("[Auth] No refresh token available");
+    return false;
+  }
+
+  // Check if access token is expired or about to expire
+  if (!isAccessTokenExpired(120)) {
+    console.log("[Auth] Access token is still valid");
+    return true;
+  }
+
+  console.log("[Auth] Access token expired or expiring soon, attempting refresh...");
+
+  try {
+    await refreshTokens();
+    console.log("[Auth] Session refreshed successfully");
+    return true;
+  } catch (error) {
+    console.error("[Auth] Failed to refresh session:", error);
+    // Clear auth data on refresh failure
+    clearAuthData();
+    return false;
+  }
+};
+
+/**
  * Auth client object for easy access
  */
 export const authClient = {
@@ -268,6 +331,8 @@ export const authClient = {
   isAuthenticated,
   clearAuthData,
   storeAuthData,
+  validateAndRefreshSession,
+  isAccessTokenExpired,
 };
 
 export default authClient;

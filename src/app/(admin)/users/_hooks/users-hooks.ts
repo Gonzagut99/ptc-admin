@@ -12,8 +12,10 @@ import {
   createJavaServerPaginationConfig,
 } from "@/lib/api-java/pagination";
 import { createPaginationRequestDto } from "@/lib/api-java/pagination-utils";
+import { useSessionReady } from "@/contexts/auth-provider";
 
 export const useGetUsers = () => {
+  const isSessionReady = useSessionReady();
   const { pageIndex, pageSize, setPagination, resetPagination } =
     useZeroBasedPagination();
 
@@ -30,13 +32,21 @@ export const useGetUsers = () => {
     debouncedSetSearch(searchValue);
   };
 
-  const query = backendJava.useQuery("get", "/users/paginados", {
-    params: {
-      query: {
-        requestDto: createPaginationRequestDto(pageIndex, pageSize),
+  const query = backendJava.useQuery(
+    "get",
+    "/users/paginados",
+    {
+      params: {
+        query: {
+          requestDto: createPaginationRequestDto(pageIndex, pageSize),
+        },
       },
     },
-  });
+    {
+      // Wait for session to be ready before making the request
+      enabled: isSessionReady,
+    }
+  );
 
   // Mapear la respuesta paginada de Java
   const paginatedData = mapJavaPaginatedResponse(query.data);
@@ -65,6 +75,7 @@ export const useGetUsers = () => {
 };
 
 export const useGetUser = (id: number) => {
+  const isSessionReady = useSessionReady();
   return backendJava.useQuery(
     "get",
     "/users/{id}",
@@ -74,7 +85,7 @@ export const useGetUser = (id: number) => {
       },
     },
     {
-      enabled: id > 0,
+      enabled: id > 0 && isSessionReady,
     },
   );
 };

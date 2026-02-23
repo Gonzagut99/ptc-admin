@@ -19,6 +19,8 @@ export {
   isAuthenticated,
   clearAuthData,
   storeAuthData,
+  validateAndRefreshSession,
+  isAccessTokenExpired,
 } from "./api-java/auth-client";
 
 /**

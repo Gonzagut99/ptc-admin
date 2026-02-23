@@ -40,14 +40,17 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
           },
         },
         queryCache: new QueryCache({
-          onError: (error) => {
+          onError: (error, query) => {
             if (error) {
               const fetchError = error as unknown as FetchError;
-              if (fetchError.statusCode === 401) {
-                toast.error("Sesión expirada");
-                // useAuthStore.getState().auth.reset();
-                // const redirect = `${router.history.location.href}`;
-                router.push("/auth/sign-in");
+              
+              // Skip 401 handling for auth session queries - these are handled by AuthProvider
+              const isAuthQuery = query.queryKey?.[0] === "auth" && query.queryKey?.[1] === "session";
+              
+              if (fetchError.statusCode === 401 && !isAuthQuery) {
+                // Only show toast and redirect for non-auth queries with 401
+                // The enhancedFetch in backend.ts handles token refresh automatically
+                console.log("[QueryProvider] 401 error on non-auth query, letting enhancedFetch handle it");
               }
               if (fetchError.statusCode === 500) {
                 toast.error("Internal Server Error!");

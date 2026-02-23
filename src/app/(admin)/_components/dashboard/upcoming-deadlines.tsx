@@ -19,8 +19,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import {
   LiquidationWithDetailsDto,
-  LIQUIDATION_STATUS_LABELS,
-  LiquidationStatus,
 } from "@/app/(admin)/liquidations/_types/liquidations.types";
 
 interface UpcomingDeadlinesProps {

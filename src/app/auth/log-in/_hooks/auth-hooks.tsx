@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { backendJava } from "@/lib/api-java/backend";
+import { backendJava, resetSessionValidation } from "@/lib/api-java/backend";
 import {
   clearAuthData,
   storeAuthData,
@@ -188,6 +188,9 @@ export const useSignOut = () => {
 
       // Clear local auth data
       clearAuthData();
+      
+      // Reset session validation state for next login
+      resetSessionValidation();
 
       // Invalidar todas las queries para limpiar el cache
       await queryClient.invalidateQueries();
@@ -206,6 +209,7 @@ export const useSignOut = () => {
       toast.error(<AuthToastError error={authError} />);
       // Even on error, clear local data and redirect
       clearAuthData();
+      resetSessionValidation();
       queryClient.clear();
       router.push("/auth/log-in");
     },
