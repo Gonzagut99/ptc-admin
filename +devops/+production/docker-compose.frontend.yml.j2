@@ -1,0 +1,31 @@
+services:
+  teaminnovation-production-frontend:
+    image: $TEAMINNOVATION_FRONTEND_REGISTRY_URL:$TEAMINNOVATION_FRONTEND_VERSION
+    container_name: teaminnovation-production-frontend
+    restart: unless-stopped
+    depends_on:
+      teaminnovation-production-backend:
+        condition: service_healthy
+    environment:
+      TZ: America/Lima
+    env_file:
+    - .env.frontend
+    networks:
+    - traefik3_proxy
+    - teaminnovation-production-network
+    labels:
+    - traefik.enable=true
+    - traefik.docker.network=traefik3_proxy
+    - traefik.http.routers.teaminnovation-production-frontend.rule=Host(`sistema.tisyct.com`)
+    - traefik.http.routers.teaminnovation-production-frontend.entrypoints=websecure
+    - traefik.http.routers.teaminnovation-production-frontend.tls.certresolver=letsencrypt
+    - traefik.http.services.teaminnovation-production-frontend.loadbalancer.server.port=3000
+    - traefik.http.routers.teaminnovation-production-frontend.tls=true
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - curl -f http://localhost:3000 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 2
+      start_period: 10s

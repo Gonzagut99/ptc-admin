@@ -1,0 +1,33 @@
+services:
+  teaminnovation-staging-frontend:
+    image: $TEAMINNOVATION_FRONTEND_REGISTRY_URL:$TEAMINNOVATION_FRONTEND_VERSION
+    container_name: teaminnovation-staging-frontend
+    restart: unless-stopped
+    depends_on:
+      teaminnovation-staging-backend:
+        condition: service_healthy
+    environment:
+      TZ: America/Lima
+    env_file:
+    - .env.frontend
+    networks:
+    - traefik3_proxy
+    - teaminnovation-staging-network
+    labels:
+    - traefik.enable=true
+    - traefik.docker.network=traefik3_proxy
+    - traefik.http.routers.teaminnovation-staging-frontend.rule=Host(`teaminnovation-staging-frontend.acide.win`)
+    - traefik.http.routers.teaminnovation-staging-frontend.entrypoints=websecure
+    - traefik.http.routers.teaminnovation-staging-frontend.tls.certresolver=cloudflare
+    - traefik.http.routers.teaminnovation-staging-frontend.tls.domains[0].main=acide.win
+    - traefik.http.routers.teaminnovation-staging-frontend.tls.domains[0].sans=*.dev.acide.win
+    - traefik.http.services.teaminnovation-staging-frontend.loadbalancer.server.port=3000
+    - traefik.http.routers.teaminnovation-staging-frontend.tls=true
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - curl -f http://localhost:3000 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 2
+      start_period: 10s

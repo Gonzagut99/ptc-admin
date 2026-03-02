@@ -1,0 +1,84 @@
+function flatten2(acc: String, input: Dynamic): Map =
+    input.toMap().flatMap((key, value) ->
+        if (value is Dynamic)
+            flatten2("\(acc)\(key).", value)
+        else Map("\(acc)\(key)", value)
+    )
+
+project_name    = "teaminnovation"
+project_stage   = "staging"
+project_service = "frontend"
+
+project_reference = "\(project_name)-\(project_stage)-\(project_service)"
+project_backend  = "\(project_name)-\(project_stage)-backend"
+project_network   = "\(project_name)-\(project_stage)-network"
+
+project_registry_ref = "\(project_name.toUpperCase())_FRONTEND_REGISTRY_URL"
+project_registry_version = "\(project_name.toUpperCase())_FRONTEND_VERSION"
+
+compose {
+    services {
+        [project_reference] {
+            image = "$\(project_registry_ref):$\(project_registry_version)"
+            container_name = project_reference
+            restart = "unless-stopped"
+            depends_on {
+                [project_backend] {
+                    condition = "service_healthy"
+                }
+            }
+            environment {
+                TZ = "America/Lima"
+            }
+            env_file {
+                ".env.frontend"
+            }
+            networks {
+                "traefik3_proxy"
+                project_network
+            }
+            labels {
+                for (key, value in flatten2("traefik.", project_traefik)) {
+                    "\(key)=\(value)"
+                }
+                "traefik.http.routers.\(project_reference).tls=true"
+            }
+            healthcheck {
+                test {
+                    "CMD-SHELL"
+                    "curl -f http://localhost:3000 || exit 1"
+                }
+                interval = "30s"
+                timeout  = "10s"
+                retries  = 2
+                start_period = "10s"
+            }
+        }
+    }
+}
+
+project_traefik {
+    enable = true
+    docker {
+        network = "traefik3_proxy"
+    }
+    http {
+        ["routers.\(project_reference)"] {
+            rule = "Host(`\(project_reference).acide.win`)"
+            // middlewares = project_name
+            entrypoints = "websecure"
+            tls {
+                certresolver = "cloudflare"
+                `domains[0]` {
+                    main = "acide.win"
+                    sans = "*.dev.acide.win"
+                }
+            }
+        }
+        ["services.\(project_reference).loadbalancer.server.port"] = 3000
+    }
+}
+
+output {
+    value = compose
+}
