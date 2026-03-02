@@ -31,7 +31,7 @@
         export PTC_BACKEND_VERSION=$(cat .version.backend 2>/dev/null || echo latest)
         export PTC_FRONTEND_REGISTRY_URL=gonzagtz/ptc-frontend
         export PTC_FRONTEND_VERSION={{ service_version }}
-        docker compose \
+        docker-compose \
           -f docker-compose.base.yml \
           -f docker-compose.{{ project_service }}.yml \
           up -d --remove-orphans
