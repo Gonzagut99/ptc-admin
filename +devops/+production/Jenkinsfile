@@ -1,131 +1,124 @@
 pipeline {
     agent any
+
     environment {
-        BUILD_REF = sh(script: "echo -n '${BUILD_TAG}' | sha256sum | cut -c1-12", returnStdout: true).trim()
-
-        PROJECT_NAME    = "teaminnovation"
-        PROJECT_SERVICE = "frontend"
-        PROJECT_STAGE   = "production"
-        PROJECT_TRIPLET   = "${PROJECT_NAME}-${PROJECT_STAGE}-${PROJECT_SERVICE}"
-
-        REMOTE_USER   = "docker_admin"
-        REMOTE_IP     = "161.132.49.104"
-        REMOTE_FOLDER = "/opt/docker/compose/projects/${PROJECT_NAME}-${PROJECT_STAGE}/"
-
-        REGISTRY_CREDENTIALS = "dockerhub-digitalesacide-credentials"
-        REGISTRY_URL         = "docker.io"
-        REGISTRY_USER        = "digitalesacide"
-        FULL_REGISTRY_URL = "${REGISTRY_URL}/${REGISTRY_USER}/${PROJECT_TRIPLET}"
-
-        // SSH credentials
-        SSH_CRED = "ssh-id_docker_admin"
-
-        // ansible variables
-        PROJECT_SERVICES  = "backend,frontend"  // Comma-separated list
-        VAULT_CREDENTIALS_ID = "ansible-vault-01-key"
+        PROJECT_NAME    = 'ptc'
+        PROJECT_SERVICE = 'frontend'
+        REGISTRY_USER   = 'gonzagtz'
+        REMOTE_USER     = 'gonzalo'
+        REMOTE_IP       = 'gonzalogtz.com'
+        COMPOSE_DIR     = "/opt/docker/compose/projects/${PROJECT_NAME}-production"
+        IMAGE_NAME      = "${REGISTRY_USER}/${PROJECT_NAME}-${PROJECT_SERVICE}"
+        API_HOST        = 'https://ptc-api.gonzalogtz.com/ptc/api'
     }
+
     stages {
-        stage("Create ansible inventory") {
+        stage('Checkout') {
             steps {
-                dir ("+devops/+$PROJECT_STAGE") {
+                checkout scm
+                script {
+                    env.VERSION = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    env.IMAGE_TAG = "${IMAGE_NAME}:${VERSION}"
+                    env.IMAGE_LATEST = "${IMAGE_NAME}:latest"
+                }
+            }
+        }
+
+        stage('Prepare Inventory') {
+            steps {
+                sh """
+                    sed -e 's/REMOTE_IP/${REMOTE_IP}/g' \
+                        -e 's/REMOTE_USER/${REMOTE_USER}/g' \
+                        +devops/+production/inventory.yml > inventory.yml
+                """
+            }
+        }
+
+        stage('Build & Push / Setup Target') {
+            parallel {
+                stage('Build & Push Image') {
+                    steps {
+                        withCredentials([usernamePassword(
+                            credentialsId: 'dockerhub-credentials',
+                            usernameVariable: 'DOCKER_USER',
+                            passwordVariable: 'DOCKER_PASS'
+                        )]) {
+                            sh """
+                                echo "\$DOCKER_PASS" | docker login -u "\$DOCKER_USER" --password-stdin
+                                docker build \
+                                    --build-arg NEXT_PUBLIC_JAVA_API_URL=${API_HOST} \
+                                    --build-arg NEXT_PUBLIC_API_URL=${API_HOST} \
+                                    --build-arg NEXT_PUBLIC_BACKEND_URL=${API_HOST} \
+                                    --build-arg NEXT_PUBLIC_DEPLOYMENT_NUMBER=${BUILD_TAG} \
+                                    --build-arg NEXT_PUBLIC_CD_ENVIRONMENT=production \
+                                    -t ${IMAGE_TAG} -t ${IMAGE_LATEST} \
+                                    -f +devops/docker/Dockerfile .
+                                docker push ${IMAGE_TAG}
+                                docker push ${IMAGE_LATEST}
+                                docker logout
+                            """
+                        }
+                    }
+                }
+                stage('Setup Target') {
+                    steps {
+                        withCredentials([sshUserPrivateKey(
+                            credentialsId: 'ssh-id_vps',
+                            keyFileVariable: 'SSH_KEY'
+                        )]) {
+                            sh """
+                                ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
+                                    -i inventory.yml \
+                                    --private-key=\$SSH_KEY \
+                                    +devops/ansible/setup_target.yml
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Pull Image on Target') {
+            steps {
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: 'ssh-id_vps',
+                    keyFileVariable: 'SSH_KEY'
+                )]) {
                     sh """
-                        sed -i 's/REMOTE_IP/${REMOTE_IP}/g' inventory.yml &&
-                        sed -i 's/REMOTE_USER/${REMOTE_USER}/g' inventory.yml
+                        ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
+                            -i inventory.yml \
+                            --private-key=\$SSH_KEY \
+                            -e "registry_image=${IMAGE_TAG}" \
+                            -e "project_service=${PROJECT_SERVICE}" \
+                            -e "version=${VERSION}" \
+                            +devops/ansible/service_pull_and_setup.yml
                     """
                 }
             }
         }
-        stage("Build & Push") {
-            parallel {
-                stage("frontend") {
-                    stages {
-                        stage("Build & Push") {
-                            steps {
-                                script {
-                                    def buildVariables = [
-                                        NEXT_PUBLIC_BACKEND_URL: "https://api-sistema.tisyct.com",
-                                        NEXT_PUBLIC_DEPLOYMENT_NUMBER: "${BUILD_TAG}",
-                                        NEXT_PUBLIC_CD_ENVIRONMENT: "${PROJECT_STAGE}",
-                                    ]
 
-                                    def dockerBuildArgs = new StringBuilder()
-                                    buildVariables.each { key, value ->
-                                        dockerBuildArgs.append("--build-arg ${key}=\"${value}\" ")
-                                    }
-
-                                    def finalDockerArgs = dockerBuildArgs.toString().trim()
-                                    echo "Generated Docker Build Args: '${finalDockerArgs}'"
-
-                                    withDockerRegistry(credentialsId: "${REGISTRY_CREDENTIALS}") {
-                                        def image = docker.build("${FULL_REGISTRY_URL}:${BUILD_REF}", "${finalDockerArgs} -f +devops/docker/Dockerfile .")
-                                        image.push()
-                                    }
-                                }
-                            }
-                        }
-                        stage("Fetch image at server") {
-                            steps {
-                                dir ("+devops/+$PROJECT_STAGE") {
-                                    ansiblePlaybook(
-                                        credentialsId: SSH_CRED,
-                                        inventory: "inventory.yml",
-                                        playbook: "../ansible/service_pull_and_setup.yml",
-                                        vaultCredentialsId: VAULT_CREDENTIALS_ID,
-                                        extras: "--extra-vars '@vault.yml'",
-                                        extraVars: [
-                                            _remote_folder: REMOTE_FOLDER,
-                                            _image_tag: BUILD_REF,
-                                            _full_registry_url: FULL_REGISTRY_URL,
-                                            _project_name: PROJECT_NAME,
-                                            _project_stage: PROJECT_STAGE,
-                                            _project_service: PROJECT_SERVICE,
-                                        ],
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    post {
-                        always {
-                            sh "docker rmi ${FULL_REGISTRY_URL}:${BUILD_REF} || true"
-                        }
-                    }
-                }
-                stage("Setup target") {
-                    steps {
-                        dir ("+devops/+$PROJECT_STAGE") {
-                            ansiblePlaybook(
-                                credentialsId: SSH_CRED,
-                                inventory: "inventory.yml",
-                                playbook: "../ansible/setup_target.yml",
-                                extraVars: [
-                                    _remote_folder: REMOTE_FOLDER,
-                                    _project_name: PROJECT_NAME,
-                                    _project_stage: PROJECT_STAGE,
-                                ],
-                            )
-                        }
-                    }
+        stage('Up Services') {
+            steps {
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: 'ssh-id_vps',
+                    keyFileVariable: 'SSH_KEY'
+                )]) {
+                    sh """
+                        ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook \
+                            -i inventory.yml \
+                            --private-key=\$SSH_KEY \
+                            -e "project_service=${PROJECT_SERVICE}" \
+                            +devops/ansible/start_service.yml
+                    """
                 }
             }
         }
-        stage("Up services") {
-            steps {
-                dir ("+devops/+$PROJECT_STAGE") {
-                    ansiblePlaybook(
-                        credentialsId: SSH_CRED,
-                        inventory: "inventory.yml",
-                        playbook: "../ansible/start_service.yml",
-                        extraVars: [
-                            _remote_folder_path: REMOTE_FOLDER,
-                            _project_services: PROJECT_SERVICES,
-                            _project_name: PROJECT_NAME,
-                            _project_stage: PROJECT_STAGE,
-                            _project_service: PROJECT_SERVICE,
-                        ],
-                    )
-                }
-            }
+    }
+
+    post {
+        always {
+            sh 'docker logout || true'
+            cleanWs()
         }
     }
 }
