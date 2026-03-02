@@ -109,10 +109,8 @@ export default function LiquidationCreateDialog({
                       <FormItem>
                         <FormLabel required>Cliente</FormLabel>
                         <Select
-                          onValueChange={(value) =>
-                            field.onChange(parseInt(value))
-                          }
-                          value={field.value ? String(field.value) : ""}
+                          onValueChange={field.onChange}
+                          value={field.value}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
@@ -152,10 +150,8 @@ export default function LiquidationCreateDialog({
                       <FormItem>
                         <FormLabel required>Personal a Cargo</FormLabel>
                         <Select
-                          onValueChange={(value) =>
-                            field.onChange(parseInt(value))
-                          }
-                          value={field.value ? String(field.value) : ""}
+                          onValueChange={field.onChange}
+                          value={field.value}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
