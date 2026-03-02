@@ -396,7 +396,155 @@ setTheme("light");
 setTheme("system");
 ```
 
-## 🤝 Contribución
+## CI/CD y Despliegue a Produccion
+
+### Arquitectura de despliegue
+
+```
+GitHub Push ──> Jenkins (VPS)
+                  │
+             ┌────┴────┐
+             │ CI Job   │  (install/lint/build)
+             └────┬────┘
+                  │ (trip/main branch)
+             ┌────┴────┐
+             │ CD Job   │  (docker build+push → ansible deploy)
+             └────┬────┘
+                  │
+         Docker Hub (gonzagtz/ptc-frontend)
+                  │
+             ┌────┴──────────────────┐
+             │        VPS            │
+             │  Nginx Proxy Manager  │──> ptc-app.gonzalogtz.com → frontend:3090
+             └───────────────────────┘
+```
+
+### Ramas de despliegue
+
+| Rama | Proposito |
+|---|---|
+| `trip/develop` | Desarrollo + CI (lint, build) |
+| `trip/main` | Produccion + CD (deploy al VPS) |
+
+### Pipeline CI (`Jenkinsfile`)
+
+Se ejecuta en cada push a `trip/develop`:
+
+1. **Checkout** + GitHub status pending
+2. **Install** - `pnpm install --frozen-lockfile`
+3. **Lint** - `npx biome check .`
+4. **Build** - `pnpm run build`
+5. **Post** - GitHub status success/failure
+
+**Tools requeridos en Jenkins:**
+- NodeJS configurado como `Node25.5` (Manage Jenkins → Tools → NodeJS)
+
+### Pipeline CD (`+devops/+production/Jenkinsfile`)
+
+Se ejecuta cuando hay cambios en `trip/main`:
+
+1. **Checkout** - Version tag con git SHA
+2. **Prepare Inventory** - Genera inventario Ansible
+3. **Build & Push / Setup Target** (paralelo):
+   - Construye imagen Docker con build-args para API URLs
+   - Copia `docker-compose.base.yml` al VPS
+4. **Pull Image on Target** - Descarga imagen en VPS
+5. **Up Services** - `docker compose up -d`
+
+**Build args inyectados:**
+- `NEXT_PUBLIC_JAVA_API_URL` = `https://ptc-api.gonzalogtz.com/ptc/api`
+- `NEXT_PUBLIC_API_URL` = `https://ptc-api.gonzalogtz.com/ptc/api`
+- `NEXT_PUBLIC_BACKEND_URL` = `https://ptc-api.gonzalogtz.com/ptc/api`
+- `NEXT_PUBLIC_DEPLOYMENT_NUMBER` = Jenkins BUILD_TAG
+- `NEXT_PUBLIC_CD_ENVIRONMENT` = `production`
+
+### Credenciales Jenkins necesarias
+
+| ID en Jenkins | Tipo | Descripcion |
+|---|---|---|
+| `github-status-token` | Secret text | GitHub PAT con scope `repo:status` |
+| `dockerhub-credentials` | Username/Password | Login Docker Hub (`gonzagtz`) |
+| `ssh-id_vps` | SSH Private Key | Clave SSH para usuario `gonzalo` en VPS |
+
+### Docker - Imagen del frontend
+
+Build multi-stage con Next.js standalone output:
+
+| Stage | Base Image | Proposito |
+|---|---|---|
+| base | `node:22-alpine` | Instala pnpm |
+| deps | `node:22-alpine` | Instala dependencias |
+| builder | `node:22-alpine` | Build con API URLs como build-args |
+| runner | `node:22-alpine` | Ejecuta `server.js` standalone |
+
+- Puerto expuesto: `3000`
+- Ejecuta como usuario no-root (`nextjs`)
+- Health check: `curl -f http://localhost:3000`
+- Variables de entorno se inyectan en build time (no runtime)
+
+### Estructura de archivos DevOps
+
+```
++devops/
+├── docker/
+│   └── Dockerfile                          # Multi-stage Next.js standalone
+├── ansible/
+│   ├── setup_target.yml                    # Crea directorio + copia docker-compose.base.yml
+│   ├── service_pull_and_setup.yml          # Pull imagen + escribe .version
+│   └── start_service.yml                   # Copia compose template + docker compose up
+└── +production/
+    ├── Jenkinsfile                          # Pipeline CD
+    ├── inventory.yml                        # Template de inventario Ansible
+    ├── vault.yml                            # Sin secretos (frontend)
+    ├── docker-compose.base.yml             # PostgreSQL 16 + network (compartido con backend)
+    └── docker-compose.frontend.yml.j2      # Template del servicio frontend
+```
+
+### Configurar Nginx Proxy Manager
+
+1. Acceder a `http://<IP_VPS>:81`
+2. **Proxy Hosts** → **Add Proxy Host**
+3. **Domain:** `ptc-app.gonzalogtz.com`
+4. **Scheme:** `http`
+5. **Forward Hostname/IP:** `172.19.0.1`
+6. **Forward Port:** `3090`
+7. Pestana **SSL** → Request new certificate → Force SSL
+
+### URLs de produccion
+
+| Servicio | URL |
+|---|---|
+| Frontend App | `https://ptc-app.gonzalogtz.com` |
+| Backend API | `https://ptc-api.gonzalogtz.com/ptc/api/` |
+| Swagger UI | `https://ptc-api.gonzalogtz.com/ptc/api/swagger-ui.html` |
+
+### Comandos utiles en el VPS
+
+```bash
+# Ver container del frontend
+docker ps | grep ptc-production-frontend
+
+# Ver logs
+docker logs ptc-production-frontend --tail 50
+
+# Reiniciar
+docker restart ptc-production-frontend
+
+# Ver version desplegada
+cat /opt/docker/compose/projects/ptc-production/.version.frontend
+```
+
+### Troubleshooting
+
+| Problema | Causa | Solucion |
+|---|---|---|
+| Bad Gateway 502 | Container caido | Verificar con `docker ps`, re-ejecutar CD |
+| Frontend se cae al deployar backend | `--remove-orphans` en compose | Ya removido de start_service.yml |
+| `depends_on undefined service` | Frontend depende de backend en compose | Ya removido depends_on del compose |
+| NodeJS tool not found | Nombre incorrecto en Jenkinsfile | Verificar nombre en Jenkins → Tools → NodeJS |
+| CORS bloqueando requests | Backend no permite dominio frontend | Agregar dominio a CorsConfig + SecurityConfig del backend |
+
+## Contribucion
 
 1. Crear rama feature desde `develop`
 2. Seguir la estructura de carpetas existente
