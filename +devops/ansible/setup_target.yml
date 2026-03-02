@@ -14,3 +14,11 @@
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
         mode: "0755"
+
+    - name: Copy docker-compose base file
+      ansible.builtin.copy:
+        src: "../+production/docker-compose.base.yml"
+        dest: "{{ compose_dir }}/docker-compose.base.yml"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0644"
