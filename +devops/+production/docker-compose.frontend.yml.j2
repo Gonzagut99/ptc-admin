@@ -3,9 +3,6 @@ services:
     image: ${PTC_FRONTEND_REGISTRY_URL}:${PTC_FRONTEND_VERSION}
     container_name: ptc-production-frontend
     restart: unless-stopped
-    depends_on:
-      ptc-production-backend:
-        condition: service_healthy
     ports:
       - "3090:3000"
     healthcheck:
