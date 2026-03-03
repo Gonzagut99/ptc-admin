@@ -1237,7 +1237,7 @@ export interface components {
             /** Format: float */
             amount?: number;
             /** Format: date-time */
-            incidencyDate: string;
+            incidency_date: string;
         };
         AddHotelServiceDto: {
             /** Format: float */
