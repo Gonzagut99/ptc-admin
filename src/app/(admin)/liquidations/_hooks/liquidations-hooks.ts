@@ -165,10 +165,10 @@ export const useGetLiquidationsByCustomer = (customerId: number) => {
 
 const invalidateLiquidationQueries = (
   queryClient: ReturnType<typeof useQueryClient>,
-  liquidationId: number,
+  _liquidationId?: number,
 ) => {
   queryClient.invalidateQueries({
-    queryKey: ["get", "/liquidations/{liquidationId}", { liquidationId }],
+    queryKey: ["get", "/liquidations/{liquidationId}"],
   });
   queryClient.invalidateQueries({
     queryKey: ["get", "/liquidations/paginated"],

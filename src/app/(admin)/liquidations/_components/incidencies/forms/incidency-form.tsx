@@ -52,7 +52,7 @@ export function IncidencyForm({
         body: {
           reason: data.reason,
           amount: data.amount ? Number(data.amount) : undefined,
-          incidencyDate: new Date(data.incidencyDate).toISOString(),
+          incidency_date: new Date(data.incidencyDate).toISOString(),
         },
       },
       {
